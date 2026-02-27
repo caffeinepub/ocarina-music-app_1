@@ -16,6 +16,22 @@ export interface Note {
   'duration' : bigint,
   'pitch' : string,
 }
+export interface OcarinaProfile {
+  'id' : string,
+  'name' : string,
+  'size' : SizePreset,
+  'description' : string,
+  'shape' : string,
+  'category' : string,
+  'image' : ExternalBlob,
+}
+export interface OcarinaProfileForm {
+  'name' : string,
+  'size' : SizePreset,
+  'description' : string,
+  'shape' : string,
+  'category' : string,
+}
 export interface PresetSong {
   'id' : string,
   'displayName' : string,
@@ -27,6 +43,10 @@ export interface Score {
   'name' : string,
   'notes' : Array<Note>,
 }
+export type SizePreset = { 'alto' : null } |
+  { 'bass' : null } |
+  { 'lowBass' : null } |
+  { 'soprano' : null };
 export interface _CaffeineStorageCreateCertificateResult {
   'method' : string,
   'blob_hash' : string,
@@ -55,10 +75,21 @@ export interface _SERVICE {
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   'addPresetSong' : ActorMethod<[string, string, Score], undefined>,
+  'bulkCreateOcarinaProfiles' : ActorMethod<
+    [Array<[string, OcarinaProfileForm, ExternalBlob]>, string],
+    undefined
+  >,
+  'createOcarinaProfile' : ActorMethod<
+    [string, OcarinaProfileForm, ExternalBlob, string],
+    undefined
+  >,
+  'deleteOcarinaProfile' : ActorMethod<[string, string], undefined>,
   'deleteSampleAssignment' : ActorMethod<[string], undefined>,
   'deleteScore' : ActorMethod<[string], undefined>,
   'getAllSampleAssignments' : ActorMethod<[], Array<SampleAssignment>>,
   'getAllScores' : ActorMethod<[], Array<Score>>,
+  'getOcarinaProfile' : ActorMethod<[string], OcarinaProfile>,
+  'getOcarinaProfiles' : ActorMethod<[], Array<OcarinaProfile>>,
   'getPresetSong' : ActorMethod<[string], PresetSong>,
   'getPresetSongList' : ActorMethod<
     [],
@@ -72,6 +103,10 @@ export interface _SERVICE {
     undefined
   >,
   'saveScore' : ActorMethod<[string, Score], undefined>,
+  'updateOcarinaProfile' : ActorMethod<
+    [string, OcarinaProfileForm, [] | [ExternalBlob], string],
+    undefined
+  >,
   'uploadSample' : ActorMethod<[string, ExternalBlob], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;

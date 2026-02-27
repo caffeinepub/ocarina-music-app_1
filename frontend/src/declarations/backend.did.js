@@ -29,10 +29,32 @@ export const Score = IDL.Record({
   'name' : IDL.Text,
   'notes' : IDL.Vec(Note),
 });
+export const SizePreset = IDL.Variant({
+  'alto' : IDL.Null,
+  'bass' : IDL.Null,
+  'lowBass' : IDL.Null,
+  'soprano' : IDL.Null,
+});
+export const OcarinaProfileForm = IDL.Record({
+  'name' : IDL.Text,
+  'size' : SizePreset,
+  'description' : IDL.Text,
+  'shape' : IDL.Text,
+  'category' : IDL.Text,
+});
 export const ExternalBlob = IDL.Vec(IDL.Nat8);
 export const SampleAssignment = IDL.Record({
   'blob' : ExternalBlob,
   'note' : IDL.Text,
+});
+export const OcarinaProfile = IDL.Record({
+  'id' : IDL.Text,
+  'name' : IDL.Text,
+  'size' : SizePreset,
+  'description' : IDL.Text,
+  'shape' : IDL.Text,
+  'category' : IDL.Text,
+  'image' : ExternalBlob,
 });
 export const PresetSong = IDL.Record({
   'id' : IDL.Text,
@@ -68,6 +90,20 @@ export const idlService = IDL.Service({
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   'addPresetSong' : IDL.Func([IDL.Text, IDL.Text, Score], [], []),
+  'bulkCreateOcarinaProfiles' : IDL.Func(
+      [
+        IDL.Vec(IDL.Tuple(IDL.Text, OcarinaProfileForm, ExternalBlob)),
+        IDL.Text,
+      ],
+      [],
+      [],
+    ),
+  'createOcarinaProfile' : IDL.Func(
+      [IDL.Text, OcarinaProfileForm, ExternalBlob, IDL.Text],
+      [],
+      [],
+    ),
+  'deleteOcarinaProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'deleteSampleAssignment' : IDL.Func([IDL.Text], [], []),
   'deleteScore' : IDL.Func([IDL.Text], [], []),
   'getAllSampleAssignments' : IDL.Func(
@@ -76,6 +112,8 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getAllScores' : IDL.Func([], [IDL.Vec(Score)], ['query']),
+  'getOcarinaProfile' : IDL.Func([IDL.Text], [OcarinaProfile], ['query']),
+  'getOcarinaProfiles' : IDL.Func([], [IDL.Vec(OcarinaProfile)], ['query']),
   'getPresetSong' : IDL.Func([IDL.Text], [PresetSong], ['query']),
   'getPresetSongList' : IDL.Func(
       [],
@@ -99,6 +137,11 @@ export const idlService = IDL.Service({
       [],
     ),
   'saveScore' : IDL.Func([IDL.Text, Score], [], []),
+  'updateOcarinaProfile' : IDL.Func(
+      [IDL.Text, OcarinaProfileForm, IDL.Opt(ExternalBlob), IDL.Text],
+      [],
+      [],
+    ),
   'uploadSample' : IDL.Func([IDL.Text, ExternalBlob], [], []),
 });
 
@@ -126,10 +169,32 @@ export const idlFactory = ({ IDL }) => {
     'name' : IDL.Text,
     'notes' : IDL.Vec(Note),
   });
+  const SizePreset = IDL.Variant({
+    'alto' : IDL.Null,
+    'bass' : IDL.Null,
+    'lowBass' : IDL.Null,
+    'soprano' : IDL.Null,
+  });
+  const OcarinaProfileForm = IDL.Record({
+    'name' : IDL.Text,
+    'size' : SizePreset,
+    'description' : IDL.Text,
+    'shape' : IDL.Text,
+    'category' : IDL.Text,
+  });
   const ExternalBlob = IDL.Vec(IDL.Nat8);
   const SampleAssignment = IDL.Record({
     'blob' : ExternalBlob,
     'note' : IDL.Text,
+  });
+  const OcarinaProfile = IDL.Record({
+    'id' : IDL.Text,
+    'name' : IDL.Text,
+    'size' : SizePreset,
+    'description' : IDL.Text,
+    'shape' : IDL.Text,
+    'category' : IDL.Text,
+    'image' : ExternalBlob,
   });
   const PresetSong = IDL.Record({
     'id' : IDL.Text,
@@ -165,6 +230,20 @@ export const idlFactory = ({ IDL }) => {
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     'addPresetSong' : IDL.Func([IDL.Text, IDL.Text, Score], [], []),
+    'bulkCreateOcarinaProfiles' : IDL.Func(
+        [
+          IDL.Vec(IDL.Tuple(IDL.Text, OcarinaProfileForm, ExternalBlob)),
+          IDL.Text,
+        ],
+        [],
+        [],
+      ),
+    'createOcarinaProfile' : IDL.Func(
+        [IDL.Text, OcarinaProfileForm, ExternalBlob, IDL.Text],
+        [],
+        [],
+      ),
+    'deleteOcarinaProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'deleteSampleAssignment' : IDL.Func([IDL.Text], [], []),
     'deleteScore' : IDL.Func([IDL.Text], [], []),
     'getAllSampleAssignments' : IDL.Func(
@@ -173,6 +252,8 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getAllScores' : IDL.Func([], [IDL.Vec(Score)], ['query']),
+    'getOcarinaProfile' : IDL.Func([IDL.Text], [OcarinaProfile], ['query']),
+    'getOcarinaProfiles' : IDL.Func([], [IDL.Vec(OcarinaProfile)], ['query']),
     'getPresetSong' : IDL.Func([IDL.Text], [PresetSong], ['query']),
     'getPresetSongList' : IDL.Func(
         [],
@@ -196,6 +277,11 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'saveScore' : IDL.Func([IDL.Text, Score], [], []),
+    'updateOcarinaProfile' : IDL.Func(
+        [IDL.Text, OcarinaProfileForm, IDL.Opt(ExternalBlob), IDL.Text],
+        [],
+        [],
+      ),
     'uploadSample' : IDL.Func([IDL.Text, ExternalBlob], [], []),
   });
 };

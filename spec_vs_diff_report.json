@@ -1,39 +1,55 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T04:00:22.480Z",
-  "summary": "The diff implements REQ-16 through REQ-19 in OcarinaVisual.tsx with image upload, draggable/resizable tone holes, bounds-constrained dragging, and per-hole independent state. The implementation appears substantially complete based on the available (truncated) diff evidence.",
+  "generatedAt": "2026-02-27T04:56:57.823Z",
+  "summary": "The diff implements the four major requirements (REQ-20 through REQ-24) with substantial coverage. REQ-20, REQ-21, REQ-22, REQ-23, and REQ-24 are largely implemented. However, several specific acceptance criteria have gaps: the backend password verification logic is not fully visible due to truncation, the 'Play Ocarina' button only loads the image URL but not hole positions/sizes/sound config, and migration of existing profiles to default Alto/C5 is not evidenced. The plain-text password constraint appears satisfied via btoa encoding.",
   "missing_requirements": [
     {
-      "id": "REQ-16",
-      "requirement": "The SVG layer itself is hidden when a custom image is active.",
-      "reason": "The diff summary mentions the component renders either the SVG or the custom image, but the truncated diff does not show explicit code hiding the SVG layer when a custom image is active. Cannot confirm from available evidence.",
+      "id": "REQ-21",
+      "requirement": "Existing profiles without a sizePitch value are defaulted to Alto/C5 on upgrade (migration logic).",
+      "reason": "The diff shows the OcarinaProfile type and CRUD operations include the size field, but no migration or upgrade hook for existing stored profiles without a sizePitch value is visible in the truncated backend/main.mo.",
       "evidence": [
-        "frontend/src/components/OcarinaVisual.tsx"
+        "backend/main.mo"
       ]
     },
     {
-      "id": "REQ-16",
-      "requirement": "Only PNG or JPEG files should be accepted; the file input should restrict to these types.",
-      "reason": "The handleFileChange only checks file.type.startsWith('image/') which allows all image types (GIF, WebP, SVG, etc.), not just PNG and JPEG as specified.",
+      "id": "REQ-22",
+      "requirement": "Each card's 'Play Ocarina' button loads that profile's custom image, hole positions/sizes, AND sound config into the main play view.",
+      "reason": "The handlePlayProfile callback in App.tsx only sets loadedProfileImage and loadedProfileName. Hole positions/sizes and sound config from the profile are not loaded into the play view, and the OcarinaProfile type does not appear to include those fields.",
       "evidence": [
-        "frontend/src/components/OcarinaVisual.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/components/OcarinaProfileCard.tsx"
+      ]
+    },
+    {
+      "id": "REQ-23",
+      "requirement": "The backend CRUD endpoints for ocarina profiles verify the password (or a hash/token derived from it) before mutating state.",
+      "reason": "The backend/main.mo is truncated and shows creatorPasswordHash is defined, but the actual password verification logic inside saveOcarinaProfile, updateOcarinaProfile, and deleteOcarinaProfile is not visible in the diff due to truncation.",
+      "evidence": [
+        "backend/main.mo"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "An 'editMode' state toggle was introduced that appears to gate the visibility or interactivity of hole overlays.",
-      "reason": "The build request does not mention an edit mode toggle; all 4 holes should simply be overlaid and interactive whenever a custom image is active without requiring a separate mode switch.",
+      "description": "Auto-scroll loops back to the beginning when the end of the strip is reached.",
+      "reason": "The build request specifies continuous auto-scrolling that pauses on hover but does not specify looping/wrap-around behavior. The implementation explicitly resets scroll position to 0 when maxScroll is reached.",
       "evidence": [
-        "frontend/src/components/OcarinaVisual.tsx"
+        "frontend/src/components/OcarinaShowcasePanel.tsx"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.72,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/components/CreatorPasswordDialog.tsx",
+    "frontend/src/components/OcarinaProfileCard.tsx",
+    "frontend/src/components/OcarinaProfileForm.tsx",
+    "frontend/src/components/OcarinaShowcasePanel.tsx",
     "frontend/src/components/OcarinaVisual.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

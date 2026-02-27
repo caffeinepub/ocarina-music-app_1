@@ -1,73 +1,116 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Replaceable ocarina image with draggable, resizable tone holes",
+  "title": "Ocarina Profile System: Size/Pitch Presets, Expandable Sliding Showcase, and Creator Password Protection",
   "requirements": [
     {
-      "id": "REQ-16",
-      "summary": "Add image upload control to replace SVG ocarina illustration with custom PNG/JPEG background",
+      "id": "REQ-20",
+      "summary": "Add four ocarina size/pitch preset options to profile form, display selected preset as footer text on profile cards",
       "acceptanceCriteria": [
-        "An upload button is visible in or near the OcarinaVisual component.",
-        "Selecting a PNG or JPEG file replaces the SVG illustration with the uploaded image rendered at the same size.",
-        "A 'Remove custom image' or reset button restores the original SVG illustration.",
-        "The uploaded image is stored in component state (client-side only; no backend persistence required)."
+        "The upload/edit form contains a size selector with exactly four options: 'Low Bass', 'Bass', 'Alto', 'Soprano'.",
+        "Each option maps internally to the corresponding root scale: Low Bass→C3, Bass→C4, Alto→C5, Soprano→C6.",
+        "The selected size label and scale (e.g., 'Alto – C5') appears as a visible footer below the ocarina photo on every profile card.",
+        "The size/scale value is stored as part of the ocarina profile in the backend."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/OcarinaVisual.tsx",
-          "operation": "modify",
-          "description": "Add state for custom image (base64 data URL or object URL), file input handler, and upload/remove buttons. Conditionally render the uploaded image as a background <img> element filling the component area when a custom image is active, hiding the existing SVG ocarina illustration. Ensure the image container maintains the same dimensions as the current SVG viewBox."
+          "path": "frontend/src/components/OcarinaProfileForm.tsx",
+          "operation": "create",
+          "description": "Create a form component for creating/editing ocarina profiles with fields for name, description, category, shape, image upload (supporting multiple files for bulk upload), and a size/pitch preset selector with four options: Low Bass (C3), Bass (C4), Alto (C5), Soprano (C6). Use shadcn/ui Select component for the preset dropdown. Include file input with multiple attribute enabled. Use the blob-storage component's ExternalBlob.fromBytes() to handle image uploads with upload progress tracking. Verify the blob-storage component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/OcarinaProfileCard.tsx",
+          "operation": "create",
+          "description": "Create a profile card component that displays an ocarina image, name, and a footer showing the size/pitch label (e.g., 'Alto – C5'). Include a 'Play Ocarina' button that triggers a callback to load the profile into the main play view. Use the blob-storage component's ExternalBlob.getDirectURL() to render the profile image. Map the SizePreset enum values to display labels with scales. Verify the blob-storage component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-17",
-      "summary": "Overlay 4 interactive draggable tone holes on custom image with real-time fingering state",
+      "id": "REQ-22",
+      "summary": "Replace separate Ocarinary page with expandable showcase panel at top of main page, horizontal scrolling strip with auto-scroll and arrow navigation",
       "acceptanceCriteria": [
-        "All 4 tone holes are rendered as overlay circles on top of the custom uploaded image.",
-        "Each hole can be dragged independently to a new position within the image container.",
-        "Dragging is constrained to the bounds of the image container so holes cannot be moved outside it.",
-        "The open/closed state of each hole continues to reflect the current fingering in real time during and after repositioning."
+        "The showcase panel is rendered at the top of the main page (above all other panels), not on a separate route.",
+        "A toggle button or header bar expands and collapses the panel with a smooth slide animation.",
+        "When expanded, all ocarina profile cards are laid out in a single horizontal row with overflow hidden.",
+        "Left (◀) and right (▶) arrow buttons scroll the strip one card position at a time.",
+        "The strip auto-scrolls horizontally when there are more cards than fit the visible area.",
+        "Auto-scroll pauses when the user hovers over the strip.",
+        "Each card shows the ocarina photo, name, and the size/pitch footer label (e.g., 'Alto – C5').",
+        "A 'Play Ocarina' button on each card loads that profile's custom image, hole positions/sizes, and sound config into the main play view.",
+        "No separate '/ocarinary' page or route is created."
       ],
       "file_operations": [
         {
+          "path": "frontend/src/components/OcarinaShowcasePanel.tsx",
+          "operation": "create",
+          "description": "Create an expandable/collapsible showcase panel that fetches all ocarina profiles via useQueries hook (getOcarinaProfiles), displays them in a horizontal scrolling strip using OcarinaProfileCard components, and provides left/right arrow navigation buttons and auto-scroll functionality. Implement smooth expand/collapse animation using CSS transitions or Tailwind classes. Auto-scroll should pause on hover. When a profile's 'Play Ocarina' button is clicked, pass the profile data (including custom image ExternalBlob URL, hole config, size preset) to a callback that updates the OcarinaVisual component state. Use the blob-storage component to handle profile image URLs. Verify the blob-storage component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the OcarinaShowcasePanel component at the top of the main page layout, above all existing panels. Add state management to handle loading a selected profile into the OcarinaVisual component (updating custom image, hole positions, and any associated metadata). Ensure the showcase panel's callback updates the shared ocarina configuration state used by OcarinaVisual."
+        },
+        {
           "path": "frontend/src/components/OcarinaVisual.tsx",
           "operation": "modify",
-          "description": "When custom image mode is active, render 4 absolutely-positioned circle elements overlaid on the image container. Add state to track each hole's {x, y} coordinates. Attach pointer event handlers (onPointerDown, onPointerMove, onPointerUp) to each hole circle to implement drag behavior with bounds checking. Apply the existing fingering state logic (from the fingering prop passed from App.tsx) to determine whether each hole renders as filled (closed) or empty (open) using stroke and fill styles that scale with the current hole size."
+          "description": "Add props or state updates to accept an external profile configuration (custom image ExternalBlob, hole positions, sizes) from the showcase panel. When a profile is loaded via the showcase, replace the current ocarina image and hole configuration with the selected profile's data. Use the blob-storage component's ExternalBlob.getDirectURL() for rendering the custom image."
         }
       ]
     },
     {
-      "id": "REQ-18",
-      "summary": "Make each overlaid tone hole independently resizable with visible resize handles",
+      "id": "REQ-23",
+      "summary": "Protect profile create/update/delete operations with creator password modal prompt",
       "acceptanceCriteria": [
-        "Each hole circle has a visible resize handle.",
-        "Dragging the resize handle increases or decreases the hole's radius.",
-        "Minimum hole radius is 6px and maximum is 60px.",
-        "The filled (closed) and empty (open) state visuals scale correctly with the hole's current size."
+        "A modal password prompt is shown before any create, edit, or delete profile action is executed.",
+        "If the password entered matches '19962026', the operation proceeds.",
+        "If the password does not match, an error message is shown and the operation is cancelled.",
+        "The backend CRUD endpoints for ocarina profiles verify the password (or a hash/token derived from it) before mutating state.",
+        "The plain-text password '19962026' is not hardcoded as a visible string in any frontend source file."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/OcarinaVisual.tsx",
+          "path": "frontend/src/components/CreatorPasswordDialog.tsx",
+          "operation": "create",
+          "description": "Create a modal dialog component using shadcn/ui Dialog that prompts for a password input before allowing create/edit/delete operations on ocarina profiles. On submit, pass the entered password to the parent callback. Display error messages if the backend operation fails due to incorrect password. Do not hardcode the plain-text password '19962026' in this file; the password validation happens on the backend."
+        },
+        {
+          "path": "frontend/src/components/OcarinaProfileForm.tsx",
           "operation": "modify",
-          "description": "Add state to track each hole's radius. For each hole circle, render a small resize handle element (e.g., a draggable circle or square positioned on the hole's edge). Attach pointer event handlers to the resize handle that adjust the hole's radius based on pointer movement distance, clamping values between 6px and 60px. Update the hole circle's radius reactively. Ensure the filled/empty visual styling (stroke width, fill opacity) scales proportionally with the radius."
+          "description": "Integrate CreatorPasswordDialog into the profile form submission flow. Before calling createOcarinaProfile, updateOcarinaProfile, or deleteOcarinaProfile backend methods, open the password dialog and pass the entered password as a parameter to these methods. Handle backend errors (e.g., incorrect password) and display error toasts using shadcn/ui toast notifications."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add or update mutation hooks for createOcarinaProfile, updateOcarinaProfile, and deleteOcarinaProfile that accept a password parameter and pass it to the corresponding backend actor methods. Ensure the mutations invalidate the ocarina profiles query cache on success."
+        },
+        {
+          "path": "frontend/src/components/OcarinaShowcasePanel.tsx",
+          "operation": "modify",
+          "description": "Add edit and delete buttons to each OcarinaProfileCard (or a settings menu). Clicking edit opens the OcarinaProfileForm pre-populated with the profile data. Clicking delete triggers the CreatorPasswordDialog before calling the delete mutation. Both actions require password verification."
         }
       ]
     },
     {
-      "id": "REQ-19",
-      "summary": "Persist custom hole positions and sizes in component state with default fallbacks",
+      "id": "REQ-24",
+      "summary": "Support bulk upload of multiple ocarina images with shared metadata, show progress indicator during bulk save",
       "acceptanceCriteria": [
-        "Each hole independently tracks its own position and radius in component state.",
-        "Changing one hole's position or size does not affect other holes.",
-        "On restoring the original SVG, holes return to their default SVG positions.",
-        "On uploading a new custom image, holes initialize to default positions spread across the image center area."
+        "The image file input in the profile form accepts multiple files.",
+        "Submitting with N images creates N separate ocarina profile records in the backend.",
+        "All N profiles share the same description, category, shape, and size/pitch preset as entered.",
+        "Each profile is independently editable after creation.",
+        "A progress indicator (e.g., 'Saving 2 of 5…') is shown during bulk upload.",
+        "On completion, all newly created profile cards appear in the horizontal showcase strip."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/OcarinaVisual.tsx",
+          "path": "frontend/src/components/OcarinaProfileForm.tsx",
           "operation": "modify",
-          "description": "Maintain a state array of 4 hole configurations, each storing {x, y, radius}. When the custom image is removed and SVG mode is restored, reset the hole array to match the default 2×2 grid positions used in the original SVG layout (no overlay holes rendered in SVG mode). When a new custom image is uploaded, initialize the hole array with sensible default positions evenly distributed in the center area of the image (e.g., a 2×2 grid at 33% and 66% of width/height) and a default radius of 20px."
+          "description": "Update the form to handle multiple image file selections via the file input. When submitting, if multiple files are selected, loop over each file and call the bulkCreateOcarinaProfiles backend method (or call createOcarinaProfile sequentially for each image) with the shared form data (name prefix, description, category, shape, size preset) and the entered password. Display a progress indicator showing 'Saving X of Y…' as each profile is created. Use the blob-storage component's ExternalBlob.fromBytes().withUploadProgress() to track individual file upload progress. Verify the blob-storage component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add or update a mutation hook for bulkCreateOcarinaProfiles that accepts an array of profile entries (each containing a unique ID, shared form data, and an image ExternalBlob) and the password. Call the backend bulkCreateOcarinaProfiles method and invalidate the ocarina profiles query cache on success."
         }
       ]
     }

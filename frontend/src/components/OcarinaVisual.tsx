@@ -9,6 +9,8 @@ interface OcarinaVisualProps {
   className?: string;
   style?: React.CSSProperties;
   fingeringMap?: FingeringMap;
+  /** Optional external image URL loaded from a profile in the showcase panel */
+  externalImageUrl?: string | null;
 }
 
 interface HoleConfig {
@@ -37,14 +39,31 @@ export const OcarinaVisual: React.FC<OcarinaVisualProps> = ({
   className = '',
   style,
   fingeringMap,
+  externalImageUrl = null,
 }) => {
-  const [customImage, setCustomImage] = useState<string | null>(null);
+  const [localImage, setLocalImage] = useState<string | null>(null);
   const [holeConfigs, setHoleConfigs] = useState<HoleConfig[]>(DEFAULT_HOLE_CONFIGS.map(h => ({ ...h })));
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [editMode, setEditMode] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // When an external profile image is loaded from the showcase, display it
+  useEffect(() => {
+    if (externalImageUrl) {
+      // Revoke any existing local blob URL
+      if (localImage && localImage.startsWith('blob:')) {
+        URL.revokeObjectURL(localImage);
+      }
+      setLocalImage(null); // clear local so external takes precedence
+      setHoleConfigs(DEFAULT_HOLE_CONFIGS.map(h => ({ ...h })));
+      setEditMode(false);
+    }
+  }, [externalImageUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // The image to display: local upload takes priority, then external profile image
+  const customImage = localImage ?? externalImageUrl ?? null;
 
   // Use custom fingering map if provided, otherwise fall back to static defaults
   const fingering: [boolean, boolean, boolean, boolean] = currentNote
@@ -58,7 +77,7 @@ export const OcarinaVisual: React.FC<OcarinaVisualProps> = ({
     if (!file) return;
     if (!file.type.startsWith('image/')) return;
     const url = URL.createObjectURL(file);
-    setCustomImage(url);
+    setLocalImage(url);
     setHoleConfigs(DEFAULT_HOLE_CONFIGS.map(h => ({ ...h })));
     setEditMode(true);
     // Reset input so same file can be re-selected
@@ -66,13 +85,13 @@ export const OcarinaVisual: React.FC<OcarinaVisualProps> = ({
   }, []);
 
   const handleRemoveImage = useCallback(() => {
-    if (customImage) {
-      URL.revokeObjectURL(customImage);
+    if (localImage && localImage.startsWith('blob:')) {
+      URL.revokeObjectURL(localImage);
     }
-    setCustomImage(null);
+    setLocalImage(null);
     setHoleConfigs(DEFAULT_HOLE_CONFIGS.map(h => ({ ...h })));
     setEditMode(false);
-  }, [customImage]);
+  }, [localImage]);
 
   // Pointer event handlers for drag/resize
   const handleHolePointerDown = useCallback((
@@ -141,18 +160,18 @@ export const OcarinaVisual: React.FC<OcarinaVisualProps> = ({
     }
   }, [dragState, holeConfigs]);
 
-  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+  const handlePointerUp = useCallback((_e: React.PointerEvent) => {
     if (dragState) {
       setDragState(null);
     }
   }, [dragState]);
 
-  // Cleanup object URL on unmount
+  // Cleanup local blob URL on unmount
   useEffect(() => {
     return () => {
-      if (customImage) URL.revokeObjectURL(customImage);
+      if (localImage && localImage.startsWith('blob:')) URL.revokeObjectURL(localImage);
     };
-  }, [customImage]);
+  }, [localImage]);
 
   // SVG hole positions (original)
   const svgHolePositions = [
@@ -494,11 +513,13 @@ export const OcarinaVisual: React.FC<OcarinaVisualProps> = ({
                 "
                 fill="url(#ov-highlight)"
               />
+              {/* Decorative lines */}
               <path d="M 72 140 Q 150 128 228 140" stroke="#7a4a18" strokeWidth="1.2" fill="none" opacity="0.35" />
               <path d="M 58 175 Q 150 162 242 175" stroke="#7a4a18" strokeWidth="1.2" fill="none" opacity="0.35" />
               <path d="M 62 210 Q 150 198 238 210" stroke="#7a4a18" strokeWidth="1.2" fill="none" opacity="0.35" />
               <path d="M 72 245 Q 150 234 228 245" stroke="#7a4a18" strokeWidth="1.2" fill="none" opacity="0.3" />
               <path d="M 88 278 Q 150 268 212 278" stroke="#7a4a18" strokeWidth="1.2" fill="none" opacity="0.25" />
+              {/* Body outline */}
               <path
                 d="
                   M 150 58
@@ -515,79 +536,79 @@ export const OcarinaVisual: React.FC<OcarinaVisualProps> = ({
                 strokeWidth="2"
                 opacity="0.7"
               />
-              {/* ===== MOUTHPIECE at BOTTOM ===== */}
+              {/* Mouthpiece at bottom */}
               <path
-                d="M 132 372 Q 150 385 168 372 L 172 400 Q 150 415 128 400 Z"
+                d="M 128 370 C 128 390, 172 390, 172 370"
                 fill="url(#ov-mouthGrad)"
+                stroke="#5a3010"
+                strokeWidth="1.5"
               />
-              <ellipse cx="150" cy="408" rx="22" ry="14" fill="#a06428" />
-              <ellipse cx="150" cy="408" rx="14" ry="9" fill="#7a4a18" />
-              <ellipse cx="150" cy="420" rx="18" ry="10" fill="#7a4a18" />
-              <ellipse cx="150" cy="422" rx="12" ry="7" fill="#3d2010" />
-              <ellipse cx="144" cy="404" rx="6" ry="3" fill="white" opacity="0.2" transform="rotate(-10, 144, 404)" />
-              <ellipse cx="150" cy="378" rx="8" ry="5" fill="#3d2010" opacity="0.8" />
+              <ellipse cx="150" cy="388" rx="18" ry="8" fill="url(#ov-mouthGrad)" stroke="#5a3010" strokeWidth="1.5" />
+              <ellipse cx="150" cy="388" rx="10" ry="4" fill="#3d1a08" opacity="0.8" />
             </g>
 
-            {/* ===== TONE HOLES — 2×2 grid on body center ===== */}
-            {svgHolePositions.map((pos, i) => (
-              <g key={i}>
-                <circle cx={pos.cx + 1} cy={pos.cy + 2} r={11} fill="#3d1a08" opacity="0.45" />
-                <circle
-                  cx={pos.cx}
-                  cy={pos.cy}
-                  r={11}
-                  fill={fingering[i] ? '#1a0a04' : 'none'}
-                  stroke="#3d2010"
-                  strokeWidth={2.5}
-                  className="transition-all duration-150"
-                />
-                {!fingering[i] && (
-                  <circle cx={pos.cx} cy={pos.cy} r={6.5} fill="none" stroke="#5a3010" strokeWidth={1} opacity={0.5} />
-                )}
-                {fingering[i] && (
-                  <circle cx={pos.cx - 3} cy={pos.cy - 3} r={2.5} fill="white" opacity={0.12} />
-                )}
-              </g>
-            ))}
+            {/* ===== TONE HOLES ===== */}
+            {svgHolePositions.map((pos, i) => {
+              const isClosed = fingering[i];
+              return (
+                <g key={i}>
+                  {/* Shadow */}
+                  <circle
+                    cx={pos.cx + 1}
+                    cy={pos.cy + 2}
+                    r="13"
+                    fill="rgba(30,10,0,0.3)"
+                  />
+                  {/* Hole */}
+                  <circle
+                    cx={pos.cx}
+                    cy={pos.cy}
+                    r="13"
+                    fill={isClosed ? '#1a0a04' : 'transparent'}
+                    stroke="#3d2010"
+                    strokeWidth="2.5"
+                    style={{ transition: 'fill 0.15s' }}
+                  />
+                  {/* Open hole inner ring */}
+                  {!isClosed && (
+                    <circle
+                      cx={pos.cx}
+                      cy={pos.cy}
+                      r="7"
+                      fill="none"
+                      stroke="rgba(90,48,16,0.4)"
+                      strokeWidth="1.5"
+                    />
+                  )}
+                  {/* Closed hole shine */}
+                  {isClosed && (
+                    <circle
+                      cx={pos.cx - 4}
+                      cy={pos.cy - 4}
+                      r="3"
+                      fill="rgba(255,255,255,0.18)"
+                    />
+                  )}
+                </g>
+              );
+            })}
 
-            {/* ===== HAND LABELS ===== */}
-            <text x="22" y="130" fontSize="9" fill="#7a4a18" opacity="0.65" fontFamily="'Lato', sans-serif" fontWeight="700" letterSpacing="0.5">L</text>
-            <text x="272" y="300" fontSize="9" fill="#7a4a18" opacity="0.65" fontFamily="'Lato', sans-serif" fontWeight="700" letterSpacing="0.5">R</text>
-
-            {/* ===== NOTE LABEL ===== */}
+            {/* Current note label */}
             {currentNote && (
-              <g>
-                <rect x="228" y="14" width="58" height="30" rx="6" fill="#3d2b1f" opacity="0.85" />
-                <text x="257" y="34" textAnchor="middle" fill="#f5ead0" fontSize="15" fontFamily="'Playfair Display', serif" fontWeight="bold">
-                  {currentNote}
-                </text>
-              </g>
+              <text
+                x="150"
+                y="450"
+                textAnchor="middle"
+                fontSize="18"
+                fontWeight="bold"
+                fill="#5a3010"
+                fontFamily="Georgia, serif"
+                opacity="0.85"
+              >
+                {currentNote}
+              </text>
             )}
-
-            {/* Decorative border */}
-            <rect x="2" y="2" width="296" height="476" rx="10" fill="none" stroke="#8b6340" strokeWidth="1.5" opacity="0.35" />
           </svg>
-        </div>
-      )}
-
-      {/* Note label overlay for custom image mode */}
-      {customImage && currentNote && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 36,
-            right: 8,
-            background: 'rgba(61,43,31,0.85)',
-            color: '#f5ead0',
-            fontSize: 13,
-            fontWeight: 'bold',
-            padding: '3px 10px',
-            borderRadius: 6,
-            fontFamily: "'Playfair Display', serif",
-            pointerEvents: 'none',
-          }}
-        >
-          {currentNote}
         </div>
       )}
     </div>

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Score, SampleAssignment } from '../backend';
+import type { Score, SampleAssignment, OcarinaProfileForm } from '../backend';
 import { ExternalBlob } from '../backend';
 
 // ─── Scores ───────────────────────────────────────────────────────────────────
@@ -101,6 +101,7 @@ export function useGetPresetSongList() {
   });
 }
 
+// Kept as a mutation so callers can use mutateAsync(id) imperatively
 export function useGetPresetSong() {
   const { actor } = useActor();
   return useMutation({
@@ -149,6 +150,102 @@ export function useSaveFingeringMap() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fingeringMap'] });
+    },
+  });
+}
+
+// ─── Ocarina Profiles ─────────────────────────────────────────────────────────
+
+export function useGetOcarinaProfiles() {
+  const { actor, isFetching } = useActor();
+  return useQuery({
+    queryKey: ['ocarinaProfiles'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getOcarinaProfiles();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useCreateOcarinaProfile() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      profileData,
+      image,
+      password,
+    }: {
+      id: string;
+      profileData: OcarinaProfileForm;
+      image: ExternalBlob;
+      password: string;
+    }) => {
+      if (!actor) throw new Error('Actor not ready');
+      return actor.createOcarinaProfile(id, profileData, image, password);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ocarinaProfiles'] });
+    },
+  });
+}
+
+export function useBulkCreateOcarinaProfiles() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      entries,
+      password,
+    }: {
+      entries: Array<[string, OcarinaProfileForm, ExternalBlob]>;
+      password: string;
+    }) => {
+      if (!actor) throw new Error('Actor not ready');
+      return actor.bulkCreateOcarinaProfiles(entries, password);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ocarinaProfiles'] });
+    },
+  });
+}
+
+export function useUpdateOcarinaProfile() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updatedProfile,
+      image,
+      password,
+    }: {
+      id: string;
+      updatedProfile: OcarinaProfileForm;
+      image: ExternalBlob | null;
+      password: string;
+    }) => {
+      if (!actor) throw new Error('Actor not ready');
+      return actor.updateOcarinaProfile(id, updatedProfile, image, password);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ocarinaProfiles'] });
+    },
+  });
+}
+
+export function useDeleteOcarinaProfile() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, password }: { id: string; password: string }) => {
+      if (!actor) throw new Error('Actor not ready');
+      return actor.deleteOcarinaProfile(id, password);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ocarinaProfiles'] });
     },
   });
 }

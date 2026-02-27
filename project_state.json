@@ -1,14 +1,16 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
-  "summary": "Ocarina music app with piano keyboard interface (C5-C6 diatonic), 2D SVG ocarina visual with hole grid and FP hands, sheet music notation editor, playback controls, sound upload, image recognition for sheet music, and preset folk songs.",
+  "projectStateVersion": 11,
+  "summary": "Ocarina music app with piano keyboard interface (C5-C6 diatonic), 2D SVG ocarina visual with hole grid and FP hands, sheet music notation editor, playback controls, sound upload, image recognition for sheet music, preset folk songs, and an Ocarina Profile system with public horizontal sliding showcase panel.",
   "architectural_notes": [
     "Map piano keys to ocarina fingering holes for C5-C6 diatonic scale (extendable to other octaves)",
     "Use 2D SVG for ocarina visual with real-time hole open/closed state and first-person hand view",
     "Image recognition pipeline for converting scanned sheet music to playable ocarina notation",
     "Ocarina SVG model: mouthpiece faces downward, hands oriented with fingers pointing up in FP view",
     "Fingering map persistence: save/load all 8 notes × 4 hole states to Motoko backend; auto-load on app startup",
-    "Custom ocarina image upload: PNG/JPEG replaces SVG illustration; 4 tone holes are overlaid as draggable/resizable indicators on top of the custom image"
+    "Custom ocarina image upload: PNG/JPEG replaces SVG illustration; 4 tone holes are overlaid as draggable/resizable indicators on top of the custom image",
+    "Ocarina size/pitch presets: Low Bass (C3), Bass (C4), Alto (C5), Soprano (C6) — set at upload, displayed as photo card footer label",
+    "Creator password (hashed) gates profile editing; all profiles are public by default"
   ],
   "known_issues": [],
   "isFixRequest": false,
@@ -148,6 +150,38 @@
         "REQ-19"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-four-ocarina-size-pitch-preset-options-low-bass-c3-bass-c4-alto-c5-soprano-c6-to-the-ocarina-profile-upload-form-when-creating-or-editing-a-profile-the-user-must-select-one-of-these-four-presets-the-selected-preset-label-e-g-alto-c5-is-displayed-as-a-footer-text-beneath-the-ocarina-photo-in-every-profile-card-in-the-showcase-panel",
+      "title": "Add four ocarina size/pitch preset options — 'Low Bass' (C3), 'Bass' (C4), 'Alto' (C5), 'Soprano' (C6) — to the ocarina profile upload form. When creating or editing a profile, the user must select one of these four presets. The selected preset label (e.g., 'Alto – C5') is displayed as a footer text beneath the ocarina photo in every profile card in the showcase panel.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-any-existing-separate-ocarinary-page-navigation-with-an-expandable-collapsible-panel-anchored-at-the-top-of-the-main-page-this-panel-slides-open-vertically-when-expanded-and-collapses-to-a-minimal-header-bar-when-closed-inside-the-expanded-panel-all-public-ocarina-profiles-are-displayed-in-a-horizontal-strip-that-scrolls-left-and-right-provide-visible-left-and-right-arrow-buttons-to-advance-the-strip-one-card-at-a-time-the-strip-also-auto-scrolls-continuously-when-more-profiles-exist-than-fit-in-the-visible-area-pausing-on-hover",
+      "title": "Replace any existing separate 'Ocarinary' page navigation with an expandable/collapsible panel anchored at the top of the main page. This panel slides open vertically when expanded and collapses to a minimal header bar when closed. Inside the expanded panel, all public ocarina profiles are displayed in a horizontal strip that scrolls left and right. Provide visible left (◀) and right (▶) arrow buttons to advance the strip one card at a time. The strip also auto-scrolls continuously when more profiles exist than fit in the visible area, pausing on hover.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-protect-all-ocarina-profile-create-update-and-delete-operations-behind-a-creator-password-when-a-user-attempts-to-save-a-new-profile-edit-an-existing-profile-or-delete-a-profile-a-password-prompt-modal-appears-the-operation-proceeds-only-if-the-entered-password-matches-the-stored-creator-password-hash-the-creator-password-is-19962026-store-a-hashed-or-encoded-version-on-the-backend-do-not-store-or-transmit-it-in-plain-text-in-the-frontend-bundle",
+      "title": "Protect all ocarina profile create, update, and delete operations behind a creator password. When a user attempts to save a new profile, edit an existing profile, or delete a profile, a password prompt modal appears. The operation proceeds only if the entered password matches the stored creator password hash. The creator password is '19962026'. Store a hashed or encoded version on the backend; do not store or transmit it in plain text in the frontend bundle.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-support-bulk-upload-of-multiple-ocarina-images-at-once-in-the-profile-creation-form-when-multiple-image-files-are-selected-all-selected-images-share-the-same-name-prefix-description-category-shape-and-size-pitch-preset-entered-in-the-form-each-image-creates-its-own-independent-ocarina-profile-record-in-the-backend-which-can-be-individually-edited-subject-to-the-creator-password-after-creation-display-a-progress-indicator-showing-how-many-profiles-have-been-saved-out-of-the-total-during-a-bulk-upload",
+      "title": "Support bulk upload of multiple ocarina images at once in the profile creation form. When multiple image files are selected, all selected images share the same name prefix, description, category, shape, and size/pitch preset entered in the form. Each image creates its own independent ocarina profile record in the backend, which can be individually edited (subject to the creator password) after creation. Display a progress indicator showing how many profiles have been saved out of the total during a bulk upload.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -237,6 +271,32 @@
       "id": "AR-22",
       "summary": "Make ocarina image replaceable: users can upload a custom PNG/JPEG to replace the SVG ocarina illustration, with draggable and resizable tone holes overlaid on top",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Ocarina Profile system: when uploading a custom ocarina image, user sets name, description, category, shape, and selects one of 4 size/pitch presets (Low Bass=C3, Bass=C4, Alto=C5, Soprano=C6). Size label shown as photo card footer. Bulk upload: multiple images share same settings but become independent editable profiles. Profile editing protected by creator password.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Horizontal sliding ocarina showcase panel: expandable/collapsible panel at top of main page showing all public ocarina profiles in a horizontally scrolling strip with left/right arrow controls. No separate page. Clicking 'Play Ocarina' on a profile loads it into the play view.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Backend: store ocarina profiles with fields: name, description, category, shape, size/pitch preset (Low Bass/Bass/Alto/Soprano mapping to C3/C4/C5/C6), custom image blob, hole positions/sizes, and sound config. Expose CRUD endpoints. Creator password gates edits.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "Update the backend Motoko actor to include the size/pitch preset field in the OcarinaProfile record type. The field stores one of four variant values corresponding to Low Bass (C3), Bass (C4), Alto (C5), or Soprano (C6). All existing profile CRUD endpoints must read and write this new field. Migrate existing stored profiles to include a default size value (e.g., Alto/C5) if not already present.",
+      "reqIds": [
+        "REQ-21"
+      ],
       "status": "pending"
     }
   ],

@@ -1,103 +1,126 @@
 {
   "kind": "build_request",
-  "title": "Replaceable ocarina image with draggable, resizable tone holes",
-  "projectName": "Ocarina Composer",
+  "title": "Ocarina Profile System: Size/Pitch Presets, Expandable Sliding Showcase, and Creator Password Protection",
+  "projectName": "Ocarina Studio",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-16",
-      "text": "Add an image upload control to the OcarinaVisual panel that lets users upload a custom PNG or JPEG file to replace the existing SVG ocarina illustration. The uploaded image is rendered as the ocarina body background, filling the same display area as the current SVG. The SVG layer itself is hidden when a custom image is active. A 'Remove custom image' button restores the original SVG illustration.",
+      "id": "REQ-20",
+      "text": "Add four ocarina size/pitch preset options — 'Low Bass' (C3), 'Bass' (C4), 'Alto' (C5), 'Soprano' (C6) — to the ocarina profile upload form. When creating or editing a profile, the user must select one of these four presets. The selected preset label (e.g., 'Alto – C5') is displayed as a footer text beneath the ocarina photo in every profile card in the showcase panel.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent-3",
-          "msg-recent-5"
+          "msg-latest"
         ],
         "quotes": [
-          "make the image of the ocarina replaceable",
-          "Image upload: Users can upload a custom PNG/JPEG to replace the SVG ocarina illustration, with the hole indicators overlaid on top"
+          "the pitch or tone is established by the size of the ocarina. make 4 preset sizes labelled low base, base, c alto and soprano. specify the scale c3,c4,c5,c6. this is set when uploading the ocarina and displayed as a photo footer"
         ]
       },
       "acceptanceCriteria": [
-        "An upload button is visible in or near the OcarinaVisual component.",
-        "Selecting a PNG or JPEG file replaces the SVG illustration with the uploaded image rendered at the same size.",
-        "A 'Remove custom image' or reset button restores the original SVG illustration.",
-        "The uploaded image is stored in component state (client-side only; no backend persistence required)."
+        "The upload/edit form contains a size selector with exactly four options: 'Low Bass', 'Bass', 'Alto', 'Soprano'.",
+        "Each option maps internally to the corresponding root scale: Low Bass→C3, Bass→C4, Alto→C5, Soprano→C6.",
+        "The selected size label and scale (e.g., 'Alto – C5') appears as a visible footer below the ocarina photo on every profile card.",
+        "The size/scale value is stored as part of the ocarina profile in the backend."
       ]
     },
     {
-      "id": "REQ-17",
-      "text": "When a custom image is active in the OcarinaVisual panel, overlay all 4 tone holes as absolutely-positioned interactive circles on top of the image. Each hole must be independently draggable to any position within the image bounds using pointer drag events. The open/closed fingering state (filled vs. empty circle) continues to update in real time as notes are selected or played.",
-      "target": "frontend",
+      "id": "REQ-21",
+      "text": "Update the backend Motoko actor to include the size/pitch preset field in the OcarinaProfile record type. The field stores one of four variant values corresponding to Low Bass (C3), Bass (C4), Alto (C5), or Soprano (C6). All existing profile CRUD endpoints must read and write this new field. Migrate existing stored profiles to include a default size value (e.g., Alto/C5) if not already present.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-recent-4",
-          "msg-recent-5"
+          "msg-latest"
         ],
         "quotes": [
-          "the holes can be relocated",
-          "Draggable holes: Each of the 4 tone holes can be dragged to any position on the ocarina image"
+          "make 4 preset sizes labelled low base, base, c alto and soprano. specify the scale c3,c4,c5,c6"
         ]
       },
       "acceptanceCriteria": [
-        "All 4 tone holes are rendered as overlay circles on top of the custom uploaded image.",
-        "Each hole can be dragged independently to a new position within the image container.",
-        "Dragging is constrained to the bounds of the image container so holes cannot be moved outside it.",
-        "The open/closed state of each hole continues to reflect the current fingering in real time during and after repositioning."
+        "The OcarinaProfile record in main.mo includes a `sizePitch` field with a variant type covering LowBass, Bass, Alto, Soprano.",
+        "saveOcarinaProfile and updateOcarinaProfile accept and persist the sizePitch field.",
+        "getOcarinaProfiles returns the sizePitch field on every profile.",
+        "Existing profiles without a sizePitch value are defaulted to Alto/C5 on upgrade."
       ]
     },
     {
-      "id": "REQ-18",
-      "text": "Each of the 4 overlaid tone holes in the custom-image mode must be independently resizable. Provide a visible resize handle (e.g., a small drag handle on the edge of the hole circle) that, when dragged, changes the radius of that hole. The minimum radius should be 6px and the maximum should be 60px. Open/closed visual state must scale with the hole size.",
+      "id": "REQ-22",
+      "text": "Replace any existing separate 'Ocarinary' page navigation with an expandable/collapsible panel anchored at the top of the main page. This panel slides open vertically when expanded and collapses to a minimal header bar when closed. Inside the expanded panel, all public ocarina profiles are displayed in a horizontal strip that scrolls left and right. Provide visible left (◀) and right (▶) arrow buttons to advance the strip one card at a time. The strip also auto-scrolls continuously when more profiles exist than fit in the visible area, pausing on hover.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent-4",
-          "msg-recent-5"
+          "msg-latest"
         ],
         "quotes": [
-          "the holes can be relocated, and resized",
-          "Resizable holes: Each hole can be resized independently"
+          "dont make a separate page, just an extendable window from main page auto sliding display, this display moves horizontally showing all the ocarina profiles, with arrow selector to move right or left"
         ]
       },
       "acceptanceCriteria": [
-        "Each hole circle has a visible resize handle.",
-        "Dragging the resize handle increases or decreases the hole's radius.",
-        "Minimum hole radius is 6px and maximum is 60px.",
-        "The filled (closed) and empty (open) state visuals scale correctly with the hole's current size."
+        "The showcase panel is rendered at the top of the main page (above all other panels), not on a separate route.",
+        "A toggle button or header bar expands and collapses the panel with a smooth slide animation.",
+        "When expanded, all ocarina profile cards are laid out in a single horizontal row with overflow hidden.",
+        "Left (◀) and right (▶) arrow buttons scroll the strip one card position at a time.",
+        "The strip auto-scrolls horizontally when there are more cards than fit the visible area.",
+        "Auto-scroll pauses when the user hovers over the strip.",
+        "Each card shows the ocarina photo, name, and the size/pitch footer label (e.g., 'Alto – C5').",
+        "A 'Play Ocarina' button on each card loads that profile's custom image, hole positions/sizes, and sound config into the main play view.",
+        "No separate '/ocarinary' page or route is created."
       ]
     },
     {
-      "id": "REQ-19",
-      "text": "Persist the custom hole positions and sizes in component state so that repositioning or resizing one hole does not affect the others. When the custom image is removed and the original SVG is restored, the holes revert to their default 2×2 grid positions as defined in OcarinaVisual.tsx. When a new custom image is uploaded, the holes start at sensible default positions centered on the image.",
-      "target": "frontend",
+      "id": "REQ-23",
+      "text": "Protect all ocarina profile create, update, and delete operations behind a creator password. When a user attempts to save a new profile, edit an existing profile, or delete a profile, a password prompt modal appears. The operation proceeds only if the entered password matches the stored creator password hash. The creator password is '19962026'. Store a hashed or encoded version on the backend; do not store or transmit it in plain text in the frontend bundle.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-recent-4",
-          "msg-recent-5"
+          "msg-latest"
         ],
         "quotes": [
-          "the holes can be relocated, and resized"
+          "creator password (19962026)"
         ]
       },
       "acceptanceCriteria": [
-        "Each hole independently tracks its own position and radius in component state.",
-        "Changing one hole's position or size does not affect other holes.",
-        "On restoring the original SVG, holes return to their default SVG positions.",
-        "On uploading a new custom image, holes initialize to default positions spread across the image center area."
+        "A modal password prompt is shown before any create, edit, or delete profile action is executed.",
+        "If the password entered matches '19962026', the operation proceeds.",
+        "If the password does not match, an error message is shown and the operation is cancelled.",
+        "The backend CRUD endpoints for ocarina profiles verify the password (or a hash/token derived from it) before mutating state.",
+        "The plain-text password '19962026' is not hardcoded as a visible string in any frontend source file."
+      ]
+    },
+    {
+      "id": "REQ-24",
+      "text": "Support bulk upload of multiple ocarina images at once in the profile creation form. When multiple image files are selected, all selected images share the same name prefix, description, category, shape, and size/pitch preset entered in the form. Each image creates its own independent ocarina profile record in the backend, which can be individually edited (subject to the creator password) after creation. Display a progress indicator showing how many profiles have been saved out of the total during a bulk upload.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "if i wan to bulk upload i can just type in the details and all of the images uploaded will have the same settings and description but be a different editable profile"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The image file input in the profile form accepts multiple files.",
+        "Submitting with N images creates N separate ocarina profile records in the backend.",
+        "All N profiles share the same description, category, shape, and size/pitch preset as entered.",
+        "Each profile is independently editable after creation.",
+        "A progress indicator (e.g., 'Saving 2 of 5…') is shown during bulk upload.",
+        "On completion, all newly created profile cards appear in the horizontal showcase strip."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "Custom image storage is client-side only (no backend changes required for image blobs).",
-    "The existing open/closed fingering logic driven by useFingeringMap must remain fully functional in both SVG and custom-image modes."
+    "Do not create a separate '/ocarinary' page or route; all ocarina profile browsing must be within the expandable panel on the main page.",
+    "Creator password for profile mutations is '19962026'; it must not appear as a plain-text literal in frontend source.",
+    "The four size/pitch presets are fixed: Low Bass=C3, Bass=C4, Alto=C5, Soprano=C6 — no free-form pitch entry.",
+    "All Motoko logic must remain in backend/main.mo (single-actor architecture).",
+    "Immutable frontend paths (useInternetIdentity.ts, useActor.ts, main.tsx, components/ui) must not be modified."
   ],
   "nonGoals": [
-    "Persisting the custom ocarina image or hole layout to the backend canister.",
-    "Allowing more or fewer than 4 tone holes.",
-    "Changing the fingering map or hole open/closed logic.",
-    "Adding resize handles or draggable holes to the original SVG illustration mode."
+    "A dedicated 'Ocarinary' page or separate route for browsing ocarina profiles.",
+    "Free-form Hz or MIDI pitch entry — only the four preset size/pitch options are supported.",
+    "Internet Identity-based ownership — creator password is the sole edit protection mechanism.",
+    "Per-hole individual pitch configuration in this iteration (size preset covers the whole ocarina).",
+    "Public/private visibility toggle — all uploaded profiles are public by default."
   ],
   "imageRequirements": {
     "required": [],

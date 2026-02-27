@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-an-image-upload-control-to-the-ocarinavisual-panel-that-lets-users-upload-a-custom-png-or-jpeg-file-to-replace-the-existing-svg-ocarina-illustration-the-uploaded-image-is-rendered-as-the-ocarina-body-background-filling-the-same-display-area-as-the-current-svg-the-svg-layer-itself-is-hidden-when-a-custom-image-is-active-a-remove-custom-image-button-restores-the-original-svg-illustration",
-      "featureTitle": "Add an image upload control to the OcarinaVisual panel that lets users upload a custom PNG or JPEG file to replace the existing SVG ocarina illustration. The uploaded image is rendered as the ocarina body background, filling the same display area as the current SVG. The SVG layer itself is hidden when a custom image is active. A 'Remove custom image' button restores the original SVG illustration.",
+      "featureId": "feature-add-four-ocarina-size-pitch-preset-options-low-bass-c3-bass-c4-alto-c5-soprano-c6-to-the-ocarina-profile-upload-form-when-creating-or-editing-a-profile-the-user-must-select-one-of-these-four-presets-the-selected-preset-label-e-g-alto-c5-is-displayed-as-a-footer-text-beneath-the-ocarina-photo-in-every-profile-card-in-the-showcase-panel",
+      "featureTitle": "Add four ocarina size/pitch preset options — 'Low Bass' (C3), 'Bass' (C4), 'Alto' (C5), 'Soprano' (C6) — to the ocarina profile upload form. When creating or editing a profile, the user must select one of these four presets. The selected preset label (e.g., 'Alto – C5') is displayed as a footer text beneath the ocarina photo in every profile card in the showcase panel.",
       "files": [
-        "frontend/src/components/OcarinaVisual.tsx"
+        "frontend/src/components/OcarinaProfileCard.tsx",
+        "frontend/src/components/OcarinaProfileForm.tsx"
       ],
       "components": [
         "blob-storage@4.0.0",
@@ -16,14 +17,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-16"
+        "REQ-20"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-when-a-custom-image-is-active-in-the-ocarinavisual-panel-overlay-all-4-tone-holes-as-absolutely-positioned-interactive-circles-on-top-of-the-image-each-hole-must-be-independently-draggable-to-any-position-within-the-image-bounds-using-pointer-drag-events-the-open-closed-fingering-state-filled-vs-empty-circle-continues-to-update-in-real-time-as-notes-are-selected-or-played",
-      "featureTitle": "When a custom image is active in the OcarinaVisual panel, overlay all 4 tone holes as absolutely-positioned interactive circles on top of the image. Each hole must be independently draggable to any position within the image bounds using pointer drag events. The open/closed fingering state (filled vs. empty circle) continues to update in real time as notes are selected or played.",
+      "featureId": "feature-replace-any-existing-separate-ocarinary-page-navigation-with-an-expandable-collapsible-panel-anchored-at-the-top-of-the-main-page-this-panel-slides-open-vertically-when-expanded-and-collapses-to-a-minimal-header-bar-when-closed-inside-the-expanded-panel-all-public-ocarina-profiles-are-displayed-in-a-horizontal-strip-that-scrolls-left-and-right-provide-visible-left-and-right-arrow-buttons-to-advance-the-strip-one-card-at-a-time-the-strip-also-auto-scrolls-continuously-when-more-profiles-exist-than-fit-in-the-visible-area-pausing-on-hover",
+      "featureTitle": "Replace any existing separate 'Ocarinary' page navigation with an expandable/collapsible panel anchored at the top of the main page. This panel slides open vertically when expanded and collapses to a minimal header bar when closed. Inside the expanded panel, all public ocarina profiles are displayed in a horizontal strip that scrolls left and right. Provide visible left (◀) and right (▶) arrow buttons to advance the strip one card at a time. The strip also auto-scrolls continuously when more profiles exist than fit in the visible area, pausing on hover.",
       "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/OcarinaShowcasePanel.tsx",
         "frontend/src/components/OcarinaVisual.tsx"
       ],
       "components": [
@@ -35,15 +38,18 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-17"
+        "REQ-22"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-each-of-the-4-overlaid-tone-holes-in-the-custom-image-mode-must-be-independently-resizable-provide-a-visible-resize-handle-e-g-a-small-drag-handle-on-the-edge-of-the-hole-circle-that-when-dragged-changes-the-radius-of-that-hole-the-minimum-radius-should-be-6px-and-the-maximum-should-be-60px-open-closed-visual-state-must-scale-with-the-hole-size",
-      "featureTitle": "Each of the 4 overlaid tone holes in the custom-image mode must be independently resizable. Provide a visible resize handle (e.g., a small drag handle on the edge of the hole circle) that, when dragged, changes the radius of that hole. The minimum radius should be 6px and the maximum should be 60px. Open/closed visual state must scale with the hole size.",
+      "featureId": "feature-protect-all-ocarina-profile-create-update-and-delete-operations-behind-a-creator-password-when-a-user-attempts-to-save-a-new-profile-edit-an-existing-profile-or-delete-a-profile-a-password-prompt-modal-appears-the-operation-proceeds-only-if-the-entered-password-matches-the-stored-creator-password-hash-the-creator-password-is-19962026-store-a-hashed-or-encoded-version-on-the-backend-do-not-store-or-transmit-it-in-plain-text-in-the-frontend-bundle",
+      "featureTitle": "Protect all ocarina profile create, update, and delete operations behind a creator password. When a user attempts to save a new profile, edit an existing profile, or delete a profile, a password prompt modal appears. The operation proceeds only if the entered password matches the stored creator password hash. The creator password is '19962026'. Store a hashed or encoded version on the backend; do not store or transmit it in plain text in the frontend bundle.",
       "files": [
-        "frontend/src/components/OcarinaVisual.tsx"
+        "frontend/src/components/CreatorPasswordDialog.tsx",
+        "frontend/src/components/OcarinaProfileForm.tsx",
+        "frontend/src/components/OcarinaShowcasePanel.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "blob-storage@4.0.0",
@@ -54,15 +60,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-18"
+        "REQ-23"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-persist-the-custom-hole-positions-and-sizes-in-component-state-so-that-repositioning-or-resizing-one-hole-does-not-affect-the-others-when-the-custom-image-is-removed-and-the-original-svg-is-restored-the-holes-revert-to-their-default-2-2-grid-positions-as-defined-in-ocarinavisual-tsx-when-a-new-custom-image-is-uploaded-the-holes-start-at-sensible-default-positions-centered-on-the-image",
-      "featureTitle": "Persist the custom hole positions and sizes in component state so that repositioning or resizing one hole does not affect the others. When the custom image is removed and the original SVG is restored, the holes revert to their default 2×2 grid positions as defined in OcarinaVisual.tsx. When a new custom image is uploaded, the holes start at sensible default positions centered on the image.",
+      "featureId": "feature-support-bulk-upload-of-multiple-ocarina-images-at-once-in-the-profile-creation-form-when-multiple-image-files-are-selected-all-selected-images-share-the-same-name-prefix-description-category-shape-and-size-pitch-preset-entered-in-the-form-each-image-creates-its-own-independent-ocarina-profile-record-in-the-backend-which-can-be-individually-edited-subject-to-the-creator-password-after-creation-display-a-progress-indicator-showing-how-many-profiles-have-been-saved-out-of-the-total-during-a-bulk-upload",
+      "featureTitle": "Support bulk upload of multiple ocarina images at once in the profile creation form. When multiple image files are selected, all selected images share the same name prefix, description, category, shape, and size/pitch preset entered in the form. Each image creates its own independent ocarina profile record in the backend, which can be individually edited (subject to the creator password) after creation. Display a progress indicator showing how many profiles have been saved out of the total during a bulk upload.",
       "files": [
-        "frontend/src/components/OcarinaVisual.tsx"
+        "frontend/src/components/OcarinaProfileForm.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "blob-storage@4.0.0",
@@ -73,7 +80,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-19"
+        "REQ-24"
       ],
       "confidence": "high"
     }

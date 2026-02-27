@@ -89,6 +89,18 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface Note {
+    fingering: Array<string>;
+    duration: bigint;
+    pitch: string;
+}
+export interface OcarinaProfileForm {
+    name: string;
+    size: SizePreset;
+    description: string;
+    shape: string;
+    category: string;
+}
 export interface _CaffeineStorageRefillInformation {
     proposed_top_up_amount?: bigint;
 }
@@ -110,14 +122,24 @@ export interface SampleAssignment {
     blob: ExternalBlob;
     note: string;
 }
+export interface OcarinaProfile {
+    id: string;
+    name: string;
+    size: SizePreset;
+    description: string;
+    shape: string;
+    category: string;
+    image: ExternalBlob;
+}
 export interface _CaffeineStorageRefillResult {
     success?: boolean;
     topped_up_amount?: bigint;
 }
-export interface Note {
-    fingering: Array<string>;
-    duration: bigint;
-    pitch: string;
+export enum SizePreset {
+    alto = "alto",
+    bass = "bass",
+    lowBass = "lowBass",
+    soprano = "soprano"
 }
 export interface backendInterface {
     _caffeineStorageBlobIsLive(hash: Uint8Array): Promise<boolean>;
@@ -127,10 +149,15 @@ export interface backendInterface {
     _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     addPresetSong(id: string, displayName: string, score: Score): Promise<void>;
+    bulkCreateOcarinaProfiles(entries: Array<[string, OcarinaProfileForm, ExternalBlob]>, password: string): Promise<void>;
+    createOcarinaProfile(id: string, profileData: OcarinaProfileForm, image: ExternalBlob, password: string): Promise<void>;
+    deleteOcarinaProfile(id: string, password: string): Promise<void>;
     deleteSampleAssignment(note: string): Promise<void>;
     deleteScore(name: string): Promise<void>;
     getAllSampleAssignments(): Promise<Array<SampleAssignment>>;
     getAllScores(): Promise<Array<Score>>;
+    getOcarinaProfile(id: string): Promise<OcarinaProfile>;
+    getOcarinaProfiles(): Promise<Array<OcarinaProfile>>;
     getPresetSong(id: string): Promise<PresetSong>;
     getPresetSongList(): Promise<Array<{
         id: string;
@@ -141,9 +168,10 @@ export interface backendInterface {
     loadFingeringMap(): Promise<Array<[string, Array<boolean>]>>;
     saveFingeringMap(newMap: Array<[string, Array<boolean>]>): Promise<void>;
     saveScore(name: string, score: Score): Promise<void>;
+    updateOcarinaProfile(id: string, updatedProfile: OcarinaProfileForm, image: ExternalBlob | null, password: string): Promise<void>;
     uploadSample(note: string, blob: ExternalBlob): Promise<void>;
 }
-import type { ExternalBlob as _ExternalBlob, Note as _Note, PresetSong as _PresetSong, SampleAssignment as _SampleAssignment, Score as _Score, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { ExternalBlob as _ExternalBlob, Note as _Note, OcarinaProfile as _OcarinaProfile, OcarinaProfileForm as _OcarinaProfileForm, PresetSong as _PresetSong, SampleAssignment as _SampleAssignment, Score as _Score, SizePreset as _SizePreset, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -244,6 +272,48 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async bulkCreateOcarinaProfiles(arg0: Array<[string, OcarinaProfileForm, ExternalBlob]>, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.bulkCreateOcarinaProfiles(await to_candid_vec_n10(this._uploadFile, this._downloadFile, arg0), arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.bulkCreateOcarinaProfiles(await to_candid_vec_n10(this._uploadFile, this._downloadFile, arg0), arg1);
+            return result;
+        }
+    }
+    async createOcarinaProfile(arg0: string, arg1: OcarinaProfileForm, arg2: ExternalBlob, arg3: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createOcarinaProfile(arg0, to_candid_OcarinaProfileForm_n12(this._uploadFile, this._downloadFile, arg1), await to_candid_ExternalBlob_n16(this._uploadFile, this._downloadFile, arg2), arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createOcarinaProfile(arg0, to_candid_OcarinaProfileForm_n12(this._uploadFile, this._downloadFile, arg1), await to_candid_ExternalBlob_n16(this._uploadFile, this._downloadFile, arg2), arg3);
+            return result;
+        }
+    }
+    async deleteOcarinaProfile(arg0: string, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteOcarinaProfile(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteOcarinaProfile(arg0, arg1);
+            return result;
+        }
+    }
     async deleteSampleAssignment(arg0: string): Promise<void> {
         if (this.processError) {
             try {
@@ -276,42 +346,70 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getAllSampleAssignments();
-                return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
+                return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getAllSampleAssignments();
-            return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
+            return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAllScores(): Promise<Array<Score>> {
         if (this.processError) {
             try {
                 const result = await this.actor.getAllScores();
-                return from_candid_vec_n14(this._uploadFile, this._downloadFile, result);
+                return from_candid_vec_n21(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getAllScores();
-            return from_candid_vec_n14(this._uploadFile, this._downloadFile, result);
+            return from_candid_vec_n21(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getOcarinaProfile(arg0: string): Promise<OcarinaProfile> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getOcarinaProfile(arg0);
+                return from_candid_OcarinaProfile_n25(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getOcarinaProfile(arg0);
+            return from_candid_OcarinaProfile_n25(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getOcarinaProfiles(): Promise<Array<OcarinaProfile>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getOcarinaProfiles();
+                return from_candid_vec_n29(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getOcarinaProfiles();
+            return from_candid_vec_n29(this._uploadFile, this._downloadFile, result);
         }
     }
     async getPresetSong(arg0: string): Promise<PresetSong> {
         if (this.processError) {
             try {
                 const result = await this.actor.getPresetSong(arg0);
-                return from_candid_PresetSong_n18(this._uploadFile, this._downloadFile, result);
+                return from_candid_PresetSong_n30(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getPresetSong(arg0);
-            return from_candid_PresetSong_n18(this._uploadFile, this._downloadFile, result);
+            return from_candid_PresetSong_n30(this._uploadFile, this._downloadFile, result);
         }
     }
     async getPresetSongList(): Promise<Array<{
@@ -335,28 +433,28 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getSampleAssignment(arg0);
-                return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n32(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getSampleAssignment(arg0);
-            return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n32(this._uploadFile, this._downloadFile, result);
         }
     }
     async getScore(arg0: string): Promise<Score> {
         if (this.processError) {
             try {
                 const result = await this.actor.getScore(arg0);
-                return from_candid_Score_n15(this._uploadFile, this._downloadFile, result);
+                return from_candid_Score_n22(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getScore(arg0);
-            return from_candid_Score_n15(this._uploadFile, this._downloadFile, result);
+            return from_candid_Score_n22(this._uploadFile, this._downloadFile, result);
         }
     }
     async loadFingeringMap(): Promise<Array<[string, Array<boolean>]>> {
@@ -401,41 +499,61 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async uploadSample(arg0: string, arg1: ExternalBlob): Promise<void> {
+    async updateOcarinaProfile(arg0: string, arg1: OcarinaProfileForm, arg2: ExternalBlob | null, arg3: string): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.uploadSample(arg0, await to_candid_ExternalBlob_n21(this._uploadFile, this._downloadFile, arg1));
+                const result = await this.actor.updateOcarinaProfile(arg0, to_candid_OcarinaProfileForm_n12(this._uploadFile, this._downloadFile, arg1), await to_candid_opt_n33(this._uploadFile, this._downloadFile, arg2), arg3);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.uploadSample(arg0, await to_candid_ExternalBlob_n21(this._uploadFile, this._downloadFile, arg1));
+            const result = await this.actor.updateOcarinaProfile(arg0, to_candid_OcarinaProfileForm_n12(this._uploadFile, this._downloadFile, arg1), await to_candid_opt_n33(this._uploadFile, this._downloadFile, arg2), arg3);
+            return result;
+        }
+    }
+    async uploadSample(arg0: string, arg1: ExternalBlob): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.uploadSample(arg0, await to_candid_ExternalBlob_n16(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.uploadSample(arg0, await to_candid_ExternalBlob_n16(this._uploadFile, this._downloadFile, arg1));
             return result;
         }
     }
 }
-async function from_candid_ExternalBlob_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
+async function from_candid_ExternalBlob_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
     return await _downloadFile(value);
 }
-function from_candid_PresetSong_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PresetSong): PresetSong {
-    return from_candid_record_n19(_uploadFile, _downloadFile, value);
+async function from_candid_OcarinaProfile_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _OcarinaProfile): Promise<OcarinaProfile> {
+    return await from_candid_record_n26(_uploadFile, _downloadFile, value);
 }
-async function from_candid_SampleAssignment_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _SampleAssignment): Promise<SampleAssignment> {
-    return await from_candid_record_n12(_uploadFile, _downloadFile, value);
+function from_candid_PresetSong_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PresetSong): PresetSong {
+    return from_candid_record_n31(_uploadFile, _downloadFile, value);
 }
-function from_candid_Score_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Score): Score {
-    return from_candid_record_n16(_uploadFile, _downloadFile, value);
+async function from_candid_SampleAssignment_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _SampleAssignment): Promise<SampleAssignment> {
+    return await from_candid_record_n19(_uploadFile, _downloadFile, value);
+}
+function from_candid_Score_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Score): Score {
+    return from_candid_record_n23(_uploadFile, _downloadFile, value);
+}
+function from_candid_SizePreset_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _SizePreset): SizePreset {
+    return from_candid_variant_n28(_uploadFile, _downloadFile, value);
 }
 function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
     return from_candid_record_n5(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
     return value.length === 0 ? null : value[0];
 }
-async function from_candid_opt_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ExternalBlob]): Promise<ExternalBlob | null> {
-    return value.length === 0 ? null : await from_candid_ExternalBlob_n13(_uploadFile, _downloadFile, value[0]);
+async function from_candid_opt_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ExternalBlob]): Promise<ExternalBlob | null> {
+    return value.length === 0 ? null : await from_candid_ExternalBlob_n20(_uploadFile, _downloadFile, value[0]);
 }
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
     return value.length === 0 ? null : value[0];
@@ -443,7 +561,7 @@ function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
 function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
-async function from_candid_record_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+async function from_candid_record_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     blob: _ExternalBlob;
     note: string;
 }): Promise<{
@@ -451,11 +569,11 @@ async function from_candid_record_n12(_uploadFile: (file: ExternalBlob) => Promi
     note: string;
 }> {
     return {
-        blob: await from_candid_ExternalBlob_n13(_uploadFile, _downloadFile, value.blob),
+        blob: await from_candid_ExternalBlob_n20(_uploadFile, _downloadFile, value.blob),
         note: value.note
     };
 }
-function from_candid_record_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     lyrics: [] | [string];
     name: string;
     notes: Array<_Note>;
@@ -465,12 +583,39 @@ function from_candid_record_n16(_uploadFile: (file: ExternalBlob) => Promise<Uin
     notes: Array<Note>;
 } {
     return {
-        lyrics: record_opt_to_undefined(from_candid_opt_n17(_uploadFile, _downloadFile, value.lyrics)),
+        lyrics: record_opt_to_undefined(from_candid_opt_n24(_uploadFile, _downloadFile, value.lyrics)),
         name: value.name,
         notes: value.notes
     };
 }
-function from_candid_record_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+async function from_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    name: string;
+    size: _SizePreset;
+    description: string;
+    shape: string;
+    category: string;
+    image: _ExternalBlob;
+}): Promise<{
+    id: string;
+    name: string;
+    size: SizePreset;
+    description: string;
+    shape: string;
+    category: string;
+    image: ExternalBlob;
+}> {
+    return {
+        id: value.id,
+        name: value.name,
+        size: from_candid_SizePreset_n27(_uploadFile, _downloadFile, value.size),
+        description: value.description,
+        shape: value.shape,
+        category: value.category,
+        image: await from_candid_ExternalBlob_n20(_uploadFile, _downloadFile, value.image)
+    };
+}
+function from_candid_record_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     id: string;
     displayName: string;
     score: _Score;
@@ -482,7 +627,7 @@ function from_candid_record_n19(_uploadFile: (file: ExternalBlob) => Promise<Uin
     return {
         id: value.id,
         displayName: value.displayName,
-        score: from_candid_Score_n15(_uploadFile, _downloadFile, value.score)
+        score: from_candid_Score_n22(_uploadFile, _downloadFile, value.score)
     };
 }
 function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -497,23 +642,67 @@ function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint
         topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
     };
 }
-async function from_candid_vec_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_SampleAssignment>): Promise<Array<SampleAssignment>> {
-    return await Promise.all(value.map(async (x)=>await from_candid_SampleAssignment_n11(_uploadFile, _downloadFile, x)));
+function from_candid_variant_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    alto: null;
+} | {
+    bass: null;
+} | {
+    lowBass: null;
+} | {
+    soprano: null;
+}): SizePreset {
+    return "alto" in value ? SizePreset.alto : "bass" in value ? SizePreset.bass : "lowBass" in value ? SizePreset.lowBass : "soprano" in value ? SizePreset.soprano : value;
 }
-function from_candid_vec_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Score>): Array<Score> {
-    return value.map((x)=>from_candid_Score_n15(_uploadFile, _downloadFile, x));
+async function from_candid_vec_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_SampleAssignment>): Promise<Array<SampleAssignment>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_SampleAssignment_n18(_uploadFile, _downloadFile, x)));
 }
-async function to_candid_ExternalBlob_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
+function from_candid_vec_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Score>): Array<Score> {
+    return value.map((x)=>from_candid_Score_n22(_uploadFile, _downloadFile, x));
+}
+async function from_candid_vec_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_OcarinaProfile>): Promise<Array<OcarinaProfile>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_OcarinaProfile_n25(_uploadFile, _downloadFile, x)));
+}
+async function to_candid_ExternalBlob_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
     return await _uploadFile(value);
+}
+function to_candid_OcarinaProfileForm_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: OcarinaProfileForm): _OcarinaProfileForm {
+    return to_candid_record_n13(_uploadFile, _downloadFile, value);
 }
 function to_candid_Score_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Score): _Score {
     return to_candid_record_n9(_uploadFile, _downloadFile, value);
+}
+function to_candid_SizePreset_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: SizePreset): _SizePreset {
+    return to_candid_variant_n15(_uploadFile, _downloadFile, value);
 }
 function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation): __CaffeineStorageRefillInformation {
     return to_candid_record_n3(_uploadFile, _downloadFile, value);
 }
 function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
     return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
+}
+async function to_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob | null): Promise<[] | [_ExternalBlob]> {
+    return value === null ? candid_none() : candid_some(await to_candid_ExternalBlob_n16(_uploadFile, _downloadFile, value));
+}
+function to_candid_record_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    name: string;
+    size: SizePreset;
+    description: string;
+    shape: string;
+    category: string;
+}): {
+    name: string;
+    size: _SizePreset;
+    description: string;
+    shape: string;
+    category: string;
+} {
+    return {
+        name: value.name,
+        size: to_candid_SizePreset_n14(_uploadFile, _downloadFile, value.size),
+        description: value.description,
+        shape: value.shape,
+        category: value.category
+    };
 }
 function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     proposed_top_up_amount?: bigint;
@@ -538,6 +727,35 @@ function to_candid_record_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
         name: value.name,
         notes: value.notes
     };
+}
+async function to_candid_tuple_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [string, OcarinaProfileForm, ExternalBlob]): Promise<[string, _OcarinaProfileForm, _ExternalBlob]> {
+    return [
+        value[0],
+        to_candid_OcarinaProfileForm_n12(_uploadFile, _downloadFile, value[1]),
+        await to_candid_ExternalBlob_n16(_uploadFile, _downloadFile, value[2])
+    ];
+}
+function to_candid_variant_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: SizePreset): {
+    alto: null;
+} | {
+    bass: null;
+} | {
+    lowBass: null;
+} | {
+    soprano: null;
+} {
+    return value == SizePreset.alto ? {
+        alto: null
+    } : value == SizePreset.bass ? {
+        bass: null
+    } : value == SizePreset.lowBass ? {
+        lowBass: null
+    } : value == SizePreset.soprano ? {
+        soprano: null
+    } : value;
+}
+async function to_candid_vec_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[string, OcarinaProfileForm, ExternalBlob]>): Promise<Array<[string, _OcarinaProfileForm, _ExternalBlob]>> {
+    return await Promise.all(value.map(async (x)=>await to_candid_tuple_n11(_uploadFile, _downloadFile, x)));
 }
 export interface CreateActorOptions {
     agent?: Agent;

@@ -16,11 +16,13 @@ import { PresetSongLibrary } from './components/PresetSongLibrary';
 import { SampleUploadPanel } from './components/SampleUploadPanel';
 import { ImageRecognitionPanel } from './components/ImageRecognitionPanel';
 import { FingeringSettingsPanel } from './components/FingeringSettingsPanel';
+import { OcarinaShowcasePanel } from './components/OcarinaShowcasePanel';
 
 import { useScoreEditor } from './hooks/useScoreEditor';
 import { usePlayback } from './hooks/usePlayback';
 import { useFingeringMap } from './hooks/useFingeringMap';
 import type { ScoreNote } from './hooks/useScoreEditor';
+import type { OcarinaProfile } from './backend';
 
 const DEFAULT_ADD_PITCH = 'C5';
 const DEFAULT_ADD_DURATION = 500;
@@ -31,6 +33,8 @@ const AppInner: React.FC = () => {
   const [activeNote, setActiveNote] = useState<string | null>(null);
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [customSamples, setCustomSamples] = useState<Record<string, string>>({});
+  const [loadedProfileImage, setLoadedProfileImage] = useState<string | null>(null);
+  const [loadedProfileName, setLoadedProfileName] = useState<string | null>(null);
 
   const editor = useScoreEditor();
   const playback = usePlayback();
@@ -71,6 +75,12 @@ const AppInner: React.FC = () => {
     setCustomSamples(samples);
   }, []);
 
+  const handlePlayProfile = useCallback((profile: OcarinaProfile) => {
+    const url = profile.image.getDirectURL();
+    setLoadedProfileImage(url);
+    setLoadedProfileName(profile.name);
+  }, []);
+
   const selectedNote = editor.selectedNoteIndex !== null
     ? editor.notes[editor.selectedNoteIndex] ?? null
     : null;
@@ -107,8 +117,29 @@ const AppInner: React.FC = () => {
         </div>
       </header>
 
+      {/* Ocarina Gallery Showcase — expandable panel at top of main content */}
+      <OcarinaShowcasePanel onPlayProfile={handlePlayProfile} />
+
       {/* Main content */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-6 flex flex-col gap-6">
+
+        {/* Loaded profile banner */}
+        {loadedProfileName && (
+          <div className="flex items-center justify-between px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 text-sm">
+            <span className="text-primary font-medium font-body">
+              🎵 Playing: <strong>{loadedProfileName}</strong>
+            </span>
+            <button
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => {
+                setLoadedProfileImage(null);
+                setLoadedProfileName(null);
+              }}
+            >
+              ✕ Clear
+            </button>
+          </div>
+        )}
 
         {/* Top row: Ocarina Visual + Controls */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -125,6 +156,7 @@ const AppInner: React.FC = () => {
                 fingeringMap={fingeringState.fingeringMap}
                 className="w-full max-w-xs"
                 style={{ height: '300px' }}
+                externalImageUrl={loadedProfileImage}
               />
             </CardContent>
           </Card>
