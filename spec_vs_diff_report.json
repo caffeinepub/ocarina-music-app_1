@@ -1,0 +1,45 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-27T03:50:35.730Z",
+  "summary": "The diff implements all three requirements (REQ-13, REQ-14, REQ-15) with generally complete coverage. Backend endpoints saveFingeringMap and loadFingeringMap are added, the useFingeringMap hook is extended with backend hydration and saveToBackend, and FingeringSettingsPanel gains a Global Controls section. However, there are notable gaps: the backend's loadFingeringMap does not return a default map when none has been saved, and the DEFAULT_FINGERING_MAP in useFingeringMap.ts differs from the values in migration.mo which may indicate inconsistency with fingeringMap.ts defaults.",
+  "missing_requirements": [
+    {
+      "id": "REQ-13",
+      "requirement": "loadFingeringMap query method returns the default map if none has been saved",
+      "reason": "The backend loadFingeringMap simply returns fingeringMap.toArray(). If fingeringMap is empty (no save ever called on a fresh canister), it returns an empty array, not the default fingering values. The migration module only initializes defaults for upgrade scenarios.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "requirement": "The map persists across canister upgrades via stable variables",
+      "reason": "The backend uses Map.empty() which creates a new empty map on each canister initialization. There is no explicit stable var declaration visible in the diff. The migration module helps with upgrades but the stable storage mechanism is not clearly demonstrated.",
+      "evidence": [
+        "backend/main.mo",
+        "backend/migration.mo"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "DEFAULT_FINGERING_MAP in useFingeringMap.ts uses different hole values for G5, A5, and B5 than what is defined in the migration module",
+      "reason": "The hook defines G5=[true,true,false,true], A5=[false,true,false,false], B5=[false,false,true,false], while migration.mo defines G5=[false,false,false,false], A5=[false,false,true,true], B5=[false,true,true,true]. The build request explicitly states not to change default values defined in fingeringMap.ts, but the hook introduces its own differing defaults.",
+      "evidence": [
+        "frontend/src/hooks/useFingeringMap.ts",
+        "backend/migration.mo"
+      ]
+    }
+  ],
+  "confidence": 0.72,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/FingeringSettingsPanel.tsx",
+    "frontend/src/hooks/useFingeringMap.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "project_state.json"
+  ]
+}

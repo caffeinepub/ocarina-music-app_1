@@ -1,0 +1,44 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-extend-the-usefingeringmap-hook-to-support-loading-the-persisted-fingering-map-from-the-backend-on-app-startup-and-saving-the-current-in-memory-fingering-map-to-the-backend-on-demand-on-mount-call-loadfingeringmap-and-override-the-local-state-with-the-retrieved-map-expose-a-savetobackend-function-that-calls-savefingeringmap-with-the-current-map",
+      "featureTitle": "Extend the `useFingeringMap` hook to support loading the persisted fingering map from the backend on app startup and saving the current in-memory fingering map to the backend on demand. On mount, call `loadFingeringMap` and override the local state with the retrieved map. Expose a `saveToBackend` function that calls `saveFingeringMap` with the current map.",
+      "files": [
+        "frontend/src/hooks/useFingeringMap.ts"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-14"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-extend-the-existing-fingeringsettingspanel-tsx-by-adding-a-global-controls-section-at-the-top-of-the-panel-this-section-must-contain-a-save-fingering-map-button-that-persists-the-current-fingering-map-for-all-8-notes-to-the-backend-via-the-savetobackend-function-from-usefingeringmap-and-a-status-indicator-e-g-saved-or-unsaved-changes-reflecting-whether-the-current-in-memory-map-matches-the-last-saved-backend-state-the-existing-per-note-hole-toggle-grid-and-reset-to-defaults-button-remain-unchanged-below-the-global-controls-section",
+      "featureTitle": "Extend the existing `FingeringSettingsPanel.tsx` by adding a 'Global Controls' section at the top of the panel. This section must contain a 'Save Fingering Map' button that persists the current fingering map for all 8 notes to the backend via the `saveToBackend` function from `useFingeringMap`, and a status indicator (e.g., 'Saved' or 'Unsaved changes') reflecting whether the current in-memory map matches the last saved backend state. The existing per-note hole toggle grid and Reset to Defaults button remain unchanged below the global controls section.",
+      "files": [
+        "frontend/src/components/FingeringSettingsPanel.tsx",
+        "frontend/src/hooks/useFingeringMap.ts"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-15"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

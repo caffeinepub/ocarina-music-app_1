@@ -1,0 +1,208 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 7,
+  "summary": "Ocarina music app with piano keyboard interface (C5-C6 diatonic), 2D SVG ocarina visual with hole grid and FP hands, sheet music notation editor, playback controls, sound upload, image recognition for sheet music, and preset folk songs.",
+  "architectural_notes": [
+    "Map piano keys to ocarina fingering holes for C5-C6 diatonic scale (extendable to other octaves)",
+    "Use 2D SVG for ocarina visual with real-time hole open/closed state and first-person hand view",
+    "Image recognition pipeline for converting scanned sheet music to playable ocarina notation",
+    "Ocarina SVG model: mouthpiece faces downward, hands oriented with fingers pointing up in FP view",
+    "Fingering map persistence: save/load all 8 notes × 4 hole states to Motoko backend; auto-load on app startup"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-create-a-piano-keyboard-ui-component-spanning-c5-to-c6-diatonic-scale-c-d-e-f-g-a-b-c-with-8-interactive-keys-each-key-when-clicked-or-pressed-via-keyboard-shortcut-triggers-playback-of-the-corresponding-ocarina-audio-sample-synthesized-via-web-audio-api-tone-if-no-uploaded-sample-exists-and-highlights-the-active-key-visually",
+      "title": "Create a piano keyboard UI component spanning C5 to C6 (diatonic scale: C D E F G A B C) with 8 interactive keys. Each key, when clicked or pressed via keyboard shortcut, triggers playback of the corresponding ocarina audio sample (synthesized via Web Audio API tone if no uploaded sample exists) and highlights the active key visually.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-2d-svg-ocarina-visual-in-first-person-fp-view-showing-two-hands-holding-the-ocarina-the-ocarina-body-contains-a-2-2-grid-of-tone-holes-4-holes-total-each-hole-renders-as-open-empty-circle-or-closed-filled-circle-to-reflect-the-fingering-for-the-currently-selected-note-hole-states-update-in-real-time-as-notes-are-selected-or-played",
+      "title": "Build a 2D SVG ocarina visual in first-person (FP) view showing two hands holding the ocarina. The ocarina body contains a 2×2 grid of tone holes (4 holes total). Each hole renders as open (empty circle) or closed (filled circle) to reflect the fingering for the currently selected note. Hole states update in real time as notes are selected or played.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-sheet-music-notation-display-area-using-traditional-music-notation-conventions-staff-lines-filled-noteheads-for-quarter-eighth-notes-open-unfilled-noteheads-for-half-whole-notes-and-ocarina-tablature-hole-diagrams-displayed-below-each-note-lyric-text-can-be-attached-below-the-tablature-of-each-note",
+      "title": "Implement a sheet music notation display area using traditional music notation conventions: staff lines, filled noteheads for quarter/eighth notes, open (unfilled) noteheads for half/whole notes, and ocarina tablature (hole diagrams) displayed below each note. Lyric text can be attached below the tablature of each note.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-a-note-editing-interface-that-allows-users-to-add-new-notes-to-the-score-by-clicking-the-piano-keyboard-or-staff-delete-selected-notes-via-a-delete-button-or-keyboard-shortcut-modify-a-note-s-pitch-or-duration-via-a-properties-panel-and-enter-edit-lyric-text-for-each-note",
+      "title": "Provide a note editing interface that allows users to: add new notes to the score by clicking the piano keyboard or staff, delete selected notes via a delete button or keyboard shortcut, modify a note's pitch or duration via a properties panel, and enter/edit lyric text for each note.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-playback-control-bar-with-play-pause-stop-repeat-save-and-load-buttons-play-sequences-through-all-notes-in-the-score-with-correct-timing-updates-the-ocarina-svg-hole-display-in-real-time-and-highlights-the-current-note-in-the-sheet-music-pause-halts-and-resumes-stop-resets-to-the-beginning-repeat-toggles-loop-mode-save-serializes-the-current-score-notes-durations-lyrics-to-backend-storage-load-retrieves-a-saved-score",
+      "title": "Implement a playback control bar with Play, Pause, Stop, Repeat, Save, and Load buttons. Play sequences through all notes in the score with correct timing, updates the ocarina SVG hole display in real time, and highlights the current note in the sheet music. Pause halts and resumes. Stop resets to the beginning. Repeat toggles loop mode. Save serializes the current score (notes, durations, lyrics) to backend storage. Load retrieves a saved score.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-sound-upload-feature-allowing-users-to-upload-wav-or-mp3-audio-files-as-custom-ocarina-samples-for-individual-notes-c5-c6-uploaded-samples-are-stored-on-the-backend-canister-and-used-during-playback-instead-of-the-default-synthesized-tones-provide-a-ui-panel-listing-per-note-sample-assignments-and-upload-controls",
+      "title": "Add a sound upload feature allowing users to upload WAV or MP3 audio files as custom ocarina samples for individual notes (C5–C6). Uploaded samples are stored on the backend canister and used during playback instead of the default synthesized tones. Provide a UI panel listing per-note sample assignments and upload controls.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-image-recognition-feature-that-accepts-an-uploaded-image-of-sheet-music-png-or-jpeg-use-client-side-image-analysis-contrast-shape-detection-via-canvas-api-to-extract-note-positions-and-attempt-to-map-them-to-ocarina-pitches-display-the-recognized-notes-as-a-new-score-for-the-user-to-review-correct-and-play-back-show-a-confidence-indicator-or-allow-manual-correction-of-each-recognized-note",
+      "title": "Implement an image recognition feature that accepts an uploaded image of sheet music (PNG or JPEG). Use client-side image analysis (contrast/shape detection via Canvas API) to extract note positions and attempt to map them to ocarina pitches. Display the recognized notes as a new score for the user to review, correct, and play back. Show a confidence indicator or allow manual correction of each recognized note.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-include-5-10-preset-folk-songs-stored-in-the-backend-canister-each-with-full-note-sequences-ocarina-tablature-data-and-enough-content-for-at-least-60-seconds-of-playback-at-a-moderate-tempo-include-songs-such-as-scarborough-fair-greensleeves-danny-boy-amazing-grace-house-of-the-rising-sun-and-similar-traditional-folk-pieces-display-a-preset-song-library-panel-where-users-can-select-and-load-any-preset",
+      "title": "Include 5–10 preset folk songs stored in the backend canister, each with full note sequences, ocarina tablature data, and enough content for at least 60 seconds of playback at a moderate tempo. Include songs such as 'Scarborough Fair', 'Greensleeves', 'Danny Boy', 'Amazing Grace', 'House of the Rising Sun', and similar traditional folk pieces. Display a preset song library panel where users can select and load any preset.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-cohesive-visual-theme-throughout-the-app-warm-earthy-tones-cream-warm-brown-forest-green-terracotta-inspired-by-a-rustic-folk-music-aesthetic-use-an-elegant-serif-handwritten-style-heading-font-paired-with-a-clean-sans-serif-body-font-the-layout-should-feel-like-a-music-journal-or-traditional-sheet-music-booklet-with-card-style-panels-subtle-parchment-textures-and-gentle-drop-shadows-apply-this-theme-consistently-across-the-piano-keyboard-svg-ocarina-notation-editor-and-all-control-panels",
+      "title": "Apply a cohesive visual theme throughout the app: warm earthy tones (cream, warm brown, forest green, terracotta) inspired by a rustic folk-music aesthetic. Use an elegant serif/handwritten-style heading font paired with a clean sans-serif body font. The layout should feel like a music journal or traditional sheet music booklet, with card-style panels, subtle parchment textures, and gentle drop shadows. Apply this theme consistently across the piano keyboard, SVG ocarina, notation editor, and all control panels.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-fingering-settings-panel-that-displays-all-8-diatonic-notes-c5-c6-and-allows-the-user-to-view-and-customize-the-4-hole-fingering-pattern-2-2-grid-open-closed-assigned-to-each-note-changes-made-in-this-panel-update-the-fingering-map-used-across-the-app-ocarina-visual-tablature-diagrams-sheet-music-hole-indicators-and-playback-display-include-a-reset-to-defaults-button-that-restores-the-original-fingering-map-from-fingeringmap-ts",
+      "title": "Add a Fingering Settings panel that displays all 8 diatonic notes (C5–C6) and allows the user to view and customize the 4-hole fingering pattern (2×2 grid: open/closed) assigned to each note. Changes made in this panel update the fingering map used across the app (ocarina visual, tablature diagrams, sheet music hole indicators, and playback display). Include a Reset to Defaults button that restores the original fingering map from fingeringMap.ts.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-ocarinavisual-tsx-svg-illustration-so-that-the-ocarina-body-is-redrawn-to-more-closely-resemble-a-real-ocarina-instrument-an-elongated-teardrop-egg-shaped-ceramic-body-with-a-clearly-visible-mouthpiece-voicing-hole-blowhole-protruding-from-the-bottom-of-the-svg-the-first-person-hand-orientation-must-be-flipped-so-that-the-left-hand-is-at-the-top-farther-from-the-player-and-the-right-hand-is-at-the-bottom-closer-to-the-player-near-the-mouthpiece-matching-the-real-playing-posture-when-the-mouthpiece-faces-downward-toward-the-viewer-the-2-2-tone-hole-grid-remains-on-the-body-and-continues-to-reflect-open-closed-fingering-states-in-real-time",
+      "title": "Redesign the OcarinaVisual.tsx SVG illustration so that the ocarina body is redrawn to more closely resemble a real ocarina instrument: an elongated teardrop/egg-shaped ceramic body with a clearly visible mouthpiece (voicing hole/blowhole) protruding from the bottom of the SVG. The first-person hand orientation must be flipped so that the left hand is at the top (farther from the player) and the right hand is at the bottom (closer to the player, near the mouthpiece), matching the real playing posture when the mouthpiece faces downward toward the viewer. The 2×2 tone-hole grid remains on the body and continues to reflect open/closed fingering states in real time.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-the-usefingeringmap-hook-to-support-loading-the-persisted-fingering-map-from-the-backend-on-app-startup-and-saving-the-current-in-memory-fingering-map-to-the-backend-on-demand-on-mount-call-loadfingeringmap-and-override-the-local-state-with-the-retrieved-map-expose-a-savetobackend-function-that-calls-savefingeringmap-with-the-current-map",
+      "title": "Extend the `useFingeringMap` hook to support loading the persisted fingering map from the backend on app startup and saving the current in-memory fingering map to the backend on demand. On mount, call `loadFingeringMap` and override the local state with the retrieved map. Expose a `saveToBackend` function that calls `saveFingeringMap` with the current map.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-the-existing-fingeringsettingspanel-tsx-by-adding-a-global-controls-section-at-the-top-of-the-panel-this-section-must-contain-a-save-fingering-map-button-that-persists-the-current-fingering-map-for-all-8-notes-to-the-backend-via-the-savetobackend-function-from-usefingeringmap-and-a-status-indicator-e-g-saved-or-unsaved-changes-reflecting-whether-the-current-in-memory-map-matches-the-last-saved-backend-state-the-existing-per-note-hole-toggle-grid-and-reset-to-defaults-button-remain-unchanged-below-the-global-controls-section",
+      "title": "Extend the existing `FingeringSettingsPanel.tsx` by adding a 'Global Controls' section at the top of the panel. This section must contain a 'Save Fingering Map' button that persists the current fingering map for all 8 notes to the backend via the `saveToBackend` function from `useFingeringMap`, and a status indicator (e.g., 'Saved' or 'Unsaved changes') reflecting whether the current in-memory map matches the last saved backend state. The existing per-note hole toggle grid and Reset to Defaults button remain unchanged below the global controls section.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Piano keyboard interface selecting notes and playing ocarina sounds (C5-C6 diatonic)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "2D SVG ocarina visual with 2x2 hole grid showing open/closed holes and FP hands",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Traditional sheet music notation with filled/unfilled circles for ocarina tablature",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Note editing: add, delete, modify notes with lyrics support",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Playback controls: Play, Pause, Stop, Repeat, Save, Load",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Sound upload and processing for custom ocarina sounds",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Image recognition to scan sheet music for ocarina playback",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "5-10 preset folk songs with ocarina tablature and 60+ seconds playback",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Backend: Implement a Motoko actor with stable storage for: (1) saved user scores (notes, durations, lyrics), (2) custom audio sample blobs keyed by note name, and (3) preset folk song definitions. Expose query and update methods for CRUD operations on scores, sample upload/retrieval, and preset song listing.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Add fingering settings panel for configuring ocarina hole mappings per note",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Redesign 2D ocarina SVG model to look more realistic with mouthpiece at the bottom and hands orientation flipped (first-person view updated accordingly)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Extend fingering settings panel with global controls section at top: save/load full fingering map (all 8 notes x 4 holes) to/from backend canister, auto-load on startup so configured tablature persists across sessions",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Add a backend endpoint to save and load the full fingering map for all 8 diatonic notes (C5–C6). Each entry maps a note name to a 4-element array of booleans (open/closed holes). Expose an update method `saveFingeringMap` that accepts the full map and a query method `loadFingeringMap` that returns the stored map, persisting data in stable storage.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Ocarina Music App",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

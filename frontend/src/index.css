@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Warm earthy palette - light mode */
+    --background: 0.96 0.018 85;
+    --foreground: 0.22 0.04 55;
+
+    --card: 0.98 0.012 80;
+    --card-foreground: 0.22 0.04 55;
+
+    --popover: 0.98 0.012 80;
+    --popover-foreground: 0.22 0.04 55;
+
+    /* Warm brown primary */
+    --primary: 0.38 0.07 55;
+    --primary-foreground: 0.97 0.01 80;
+
+    /* Cream secondary */
+    --secondary: 0.92 0.025 85;
+    --secondary-foreground: 0.30 0.06 55;
+
+    /* Muted parchment */
+    --muted: 0.90 0.02 80;
+    --muted-foreground: 0.50 0.04 60;
+
+    /* Forest green accent */
+    --accent: 0.42 0.09 155;
+    --accent-foreground: 0.97 0.01 80;
+
+    /* Terracotta destructive */
+    --destructive: 0.55 0.18 30;
+    --destructive-foreground: 0.97 0.01 80;
+
+    --border: 0.82 0.03 75;
+    --input: 0.88 0.025 78;
+    --ring: 0.38 0.07 55;
+
+    --chart-1: 0.55 0.18 30;
+    --chart-2: 0.42 0.09 155;
+    --chart-3: 0.38 0.07 55;
+    --chart-4: 0.65 0.12 85;
+    --chart-5: 0.50 0.14 45;
+
+    --sidebar: 0.94 0.022 82;
+    --sidebar-foreground: 0.22 0.04 55;
+    --sidebar-primary: 0.38 0.07 55;
+    --sidebar-primary-foreground: 0.97 0.01 80;
+    --sidebar-accent: 0.90 0.025 80;
+    --sidebar-accent-foreground: 0.30 0.06 55;
+    --sidebar-border: 0.82 0.03 75;
+    --sidebar-ring: 0.38 0.07 55;
+  }
+
+  .dark {
+    --background: 0.16 0.03 55;
+    --foreground: 0.93 0.02 80;
+
+    --card: 0.20 0.035 55;
+    --card-foreground: 0.93 0.02 80;
+
+    --popover: 0.22 0.035 55;
+    --popover-foreground: 0.93 0.02 80;
+
+    --primary: 0.78 0.06 80;
+    --primary-foreground: 0.18 0.04 55;
+
+    --secondary: 0.26 0.04 55;
+    --secondary-foreground: 0.90 0.02 80;
+
+    --muted: 0.26 0.04 55;
+    --muted-foreground: 0.65 0.03 70;
+
+    --accent: 0.50 0.10 155;
+    --accent-foreground: 0.97 0.01 80;
+
+    --destructive: 0.60 0.18 28;
+    --destructive-foreground: 0.97 0.01 80;
+
+    --border: 0.30 0.04 55;
+    --input: 0.28 0.04 55;
+    --ring: 0.65 0.06 75;
+
+    --chart-1: 0.60 0.18 28;
+    --chart-2: 0.50 0.10 155;
+    --chart-3: 0.78 0.06 80;
+    --chart-4: 0.65 0.12 85;
+    --chart-5: 0.55 0.14 45;
+
+    --sidebar: 0.20 0.035 55;
+    --sidebar-foreground: 0.93 0.02 80;
+    --sidebar-primary: 0.78 0.06 80;
+    --sidebar-primary-foreground: 0.18 0.04 55;
+    --sidebar-accent: 0.26 0.04 55;
+    --sidebar-accent-foreground: 0.90 0.02 80;
+    --sidebar-border: 0.30 0.04 55;
+    --sidebar-ring: 0.65 0.06 75;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Lato', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer utilities {
+  .parchment-bg {
+    background-image:
+      radial-gradient(ellipse at 20% 30%, oklch(0.94 0.025 85 / 0.6) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 70%, oklch(0.90 0.03 75 / 0.4) 0%, transparent 60%);
+  }
+
+  .staff-line {
+    stroke: oklch(0.35 0.05 55);
+    stroke-width: 1;
+  }
+
+  .note-active {
+    filter: drop-shadow(0 0 6px oklch(0.55 0.18 30 / 0.8));
+  }
+
+  .piano-key-white {
+    background: linear-gradient(to bottom, oklch(0.97 0.01 80), oklch(0.92 0.02 80));
+    border: 1px solid oklch(0.70 0.04 65);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 6px oklch(0.30 0.05 55 / 0.3), inset 0 1px 0 oklch(0.99 0.005 80);
+  }
+
+  .piano-key-white:hover {
+    background: linear-gradient(to bottom, oklch(0.95 0.025 85), oklch(0.90 0.03 82));
+  }
+
+  .piano-key-white.active {
+    background: linear-gradient(to bottom, oklch(0.88 0.04 85), oklch(0.84 0.05 82));
+    box-shadow: 0 1px 3px oklch(0.30 0.05 55 / 0.4), inset 0 2px 4px oklch(0.30 0.05 55 / 0.2);
+    transform: translateY(2px);
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: oklch(0.90 0.02 80);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: oklch(0.65 0.05 65);
+    border-radius: 3px;
+  }
+}

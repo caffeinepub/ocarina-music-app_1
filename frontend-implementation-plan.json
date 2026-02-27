@@ -1,0 +1,47 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Persist fingering map to backend and extend Fingering Settings panel with global controls",
+  "requirements": [
+    {
+      "id": "REQ-14",
+      "summary": "Extend the useFingeringMap hook to load the persisted fingering map from the backend on app startup and save the current in-memory fingering map to the backend on demand",
+      "acceptanceCriteria": [
+        "On app startup, the hook calls loadFingeringMap and hydrates the local fingering map with the backend response.",
+        "The hook exposes a saveToBackend async function that calls the backend saveFingeringMap with the current full map.",
+        "If no saved map exists on the backend, the hook falls back to the built-in defaults from fingeringMap.ts.",
+        "Loading state and error state are handled gracefully (no crash if backend is unavailable)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useFingeringMap.ts",
+          "operation": "modify",
+          "description": "Add backend integration to the useFingeringMap hook. On mount, call the backend loadFingeringMap query method and hydrate the local fingering map state with the retrieved data (or fall back to built-in defaults if the backend returns an empty array). Expose a new saveToBackend async function that calls the backend saveFingeringMap update method with the current full map converted to an array of [note, boolean[]] tuples. Handle loading and error states gracefully by wrapping backend calls in try-catch blocks and logging errors without crashing the app. Use the useActor hook to obtain the backend actor instance."
+        }
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "summary": "Extend the existing FingeringSettingsPanel.tsx by adding a Global Controls section at the top with a Save Fingering Map button and a status indicator for unsaved changes",
+      "acceptanceCriteria": [
+        "A clearly labeled 'Global Controls' section appears at the top of the Fingering Settings panel.",
+        "A 'Save Fingering Map' button calls saveToBackend and shows a success or error toast/notification on completion.",
+        "A status indicator displays whether there are unsaved changes compared to the last successfully saved backend state.",
+        "The existing per-note fingering toggles and Reset to Defaults button remain fully functional below the global controls section.",
+        "The panel's visual style matches the existing warm earthy theme."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useFingeringMap.ts",
+          "operation": "modify",
+          "description": "Extend the hook's return value to include an isDirty boolean state that tracks whether the current in-memory fingering map differs from the last successfully saved backend state. Initialize isDirty to false, set it to true whenever a hole is toggled via toggleHole, and reset it to false after a successful saveToBackend call or after loading from the backend. This state will be consumed by the FingeringSettingsPanel to display an unsaved changes indicator."
+        },
+        {
+          "path": "frontend/src/components/FingeringSettingsPanel.tsx",
+          "operation": "modify",
+          "description": "Add a new Global Controls section at the top of the panel, above the existing per-note fingering grid. Include a Save Fingering Map button that calls the saveToBackend function from useFingeringMap and displays a success or error toast notification on completion (use a simple alert or console log if no toast library is available). Add a status indicator next to the button that shows 'Unsaved changes' when the isDirty state is true, or 'All changes saved' when false. Style the new section to match the existing warm earthy theme using Tailwind classes. Ensure the existing per-note hole toggle grid and Reset to Defaults button remain unchanged and fully functional below the global controls section."
+        }
+      ]
+    }
+  ]
+}
