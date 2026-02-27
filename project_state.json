@@ -1,13 +1,14 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
+  "projectStateVersion": 9,
   "summary": "Ocarina music app with piano keyboard interface (C5-C6 diatonic), 2D SVG ocarina visual with hole grid and FP hands, sheet music notation editor, playback controls, sound upload, image recognition for sheet music, and preset folk songs.",
   "architectural_notes": [
     "Map piano keys to ocarina fingering holes for C5-C6 diatonic scale (extendable to other octaves)",
     "Use 2D SVG for ocarina visual with real-time hole open/closed state and first-person hand view",
     "Image recognition pipeline for converting scanned sheet music to playable ocarina notation",
     "Ocarina SVG model: mouthpiece faces downward, hands oriented with fingers pointing up in FP view",
-    "Fingering map persistence: save/load all 8 notes × 4 hole states to Motoko backend; auto-load on app startup"
+    "Fingering map persistence: save/load all 8 notes × 4 hole states to Motoko backend; auto-load on app startup",
+    "Custom ocarina image upload: PNG/JPEG replaces SVG illustration; 4 tone holes are overlaid as draggable/resizable indicators on top of the custom image"
   ],
   "known_issues": [],
   "isFixRequest": false,
@@ -115,6 +116,38 @@
         "REQ-15"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-an-image-upload-control-to-the-ocarinavisual-panel-that-lets-users-upload-a-custom-png-or-jpeg-file-to-replace-the-existing-svg-ocarina-illustration-the-uploaded-image-is-rendered-as-the-ocarina-body-background-filling-the-same-display-area-as-the-current-svg-the-svg-layer-itself-is-hidden-when-a-custom-image-is-active-a-remove-custom-image-button-restores-the-original-svg-illustration",
+      "title": "Add an image upload control to the OcarinaVisual panel that lets users upload a custom PNG or JPEG file to replace the existing SVG ocarina illustration. The uploaded image is rendered as the ocarina body background, filling the same display area as the current SVG. The SVG layer itself is hidden when a custom image is active. A 'Remove custom image' button restores the original SVG illustration.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-a-custom-image-is-active-in-the-ocarinavisual-panel-overlay-all-4-tone-holes-as-absolutely-positioned-interactive-circles-on-top-of-the-image-each-hole-must-be-independently-draggable-to-any-position-within-the-image-bounds-using-pointer-drag-events-the-open-closed-fingering-state-filled-vs-empty-circle-continues-to-update-in-real-time-as-notes-are-selected-or-played",
+      "title": "When a custom image is active in the OcarinaVisual panel, overlay all 4 tone holes as absolutely-positioned interactive circles on top of the image. Each hole must be independently draggable to any position within the image bounds using pointer drag events. The open/closed fingering state (filled vs. empty circle) continues to update in real time as notes are selected or played.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-each-of-the-4-overlaid-tone-holes-in-the-custom-image-mode-must-be-independently-resizable-provide-a-visible-resize-handle-e-g-a-small-drag-handle-on-the-edge-of-the-hole-circle-that-when-dragged-changes-the-radius-of-that-hole-the-minimum-radius-should-be-6px-and-the-maximum-should-be-60px-open-closed-visual-state-must-scale-with-the-hole-size",
+      "title": "Each of the 4 overlaid tone holes in the custom-image mode must be independently resizable. Provide a visible resize handle (e.g., a small drag handle on the edge of the hole circle) that, when dragged, changes the radius of that hole. The minimum radius should be 6px and the maximum should be 60px. Open/closed visual state must scale with the hole size.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-persist-the-custom-hole-positions-and-sizes-in-component-state-so-that-repositioning-or-resizing-one-hole-does-not-affect-the-others-when-the-custom-image-is-removed-and-the-original-svg-is-restored-the-holes-revert-to-their-default-2-2-grid-positions-as-defined-in-ocarinavisual-tsx-when-a-new-custom-image-is-uploaded-the-holes-start-at-sensible-default-positions-centered-on-the-image",
+      "title": "Persist the custom hole positions and sizes in component state so that repositioning or resizing one hole does not affect the others. When the custom image is removed and the original SVG is restored, the holes revert to their default 2×2 grid positions as defined in OcarinaVisual.tsx. When a new custom image is uploaded, the holes start at sensible default positions centered on the image.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -198,6 +231,12 @@
       "reqIds": [
         "REQ-13"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Make ocarina image replaceable: users can upload a custom PNG/JPEG to replace the SVG ocarina illustration, with draggable and resizable tone holes overlaid on top",
+      "reqIds": [],
       "status": "pending"
     }
   ],

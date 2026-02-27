@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-extend-the-usefingeringmap-hook-to-support-loading-the-persisted-fingering-map-from-the-backend-on-app-startup-and-saving-the-current-in-memory-fingering-map-to-the-backend-on-demand-on-mount-call-loadfingeringmap-and-override-the-local-state-with-the-retrieved-map-expose-a-savetobackend-function-that-calls-savefingeringmap-with-the-current-map",
-      "featureTitle": "Extend the `useFingeringMap` hook to support loading the persisted fingering map from the backend on app startup and saving the current in-memory fingering map to the backend on demand. On mount, call `loadFingeringMap` and override the local state with the retrieved map. Expose a `saveToBackend` function that calls `saveFingeringMap` with the current map.",
+      "featureId": "feature-add-an-image-upload-control-to-the-ocarinavisual-panel-that-lets-users-upload-a-custom-png-or-jpeg-file-to-replace-the-existing-svg-ocarina-illustration-the-uploaded-image-is-rendered-as-the-ocarina-body-background-filling-the-same-display-area-as-the-current-svg-the-svg-layer-itself-is-hidden-when-a-custom-image-is-active-a-remove-custom-image-button-restores-the-original-svg-illustration",
+      "featureTitle": "Add an image upload control to the OcarinaVisual panel that lets users upload a custom PNG or JPEG file to replace the existing SVG ocarina illustration. The uploaded image is rendered as the ocarina body background, filling the same display area as the current SVG. The SVG layer itself is hidden when a custom image is active. A 'Remove custom image' button restores the original SVG illustration.",
       "files": [
-        "frontend/src/hooks/useFingeringMap.ts"
+        "frontend/src/components/OcarinaVisual.tsx"
       ],
       "components": [
         "blob-storage@4.0.0",
@@ -16,16 +16,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-14"
+        "REQ-16"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-extend-the-existing-fingeringsettingspanel-tsx-by-adding-a-global-controls-section-at-the-top-of-the-panel-this-section-must-contain-a-save-fingering-map-button-that-persists-the-current-fingering-map-for-all-8-notes-to-the-backend-via-the-savetobackend-function-from-usefingeringmap-and-a-status-indicator-e-g-saved-or-unsaved-changes-reflecting-whether-the-current-in-memory-map-matches-the-last-saved-backend-state-the-existing-per-note-hole-toggle-grid-and-reset-to-defaults-button-remain-unchanged-below-the-global-controls-section",
-      "featureTitle": "Extend the existing `FingeringSettingsPanel.tsx` by adding a 'Global Controls' section at the top of the panel. This section must contain a 'Save Fingering Map' button that persists the current fingering map for all 8 notes to the backend via the `saveToBackend` function from `useFingeringMap`, and a status indicator (e.g., 'Saved' or 'Unsaved changes') reflecting whether the current in-memory map matches the last saved backend state. The existing per-note hole toggle grid and Reset to Defaults button remain unchanged below the global controls section.",
+      "featureId": "feature-when-a-custom-image-is-active-in-the-ocarinavisual-panel-overlay-all-4-tone-holes-as-absolutely-positioned-interactive-circles-on-top-of-the-image-each-hole-must-be-independently-draggable-to-any-position-within-the-image-bounds-using-pointer-drag-events-the-open-closed-fingering-state-filled-vs-empty-circle-continues-to-update-in-real-time-as-notes-are-selected-or-played",
+      "featureTitle": "When a custom image is active in the OcarinaVisual panel, overlay all 4 tone holes as absolutely-positioned interactive circles on top of the image. Each hole must be independently draggable to any position within the image bounds using pointer drag events. The open/closed fingering state (filled vs. empty circle) continues to update in real time as notes are selected or played.",
       "files": [
-        "frontend/src/components/FingeringSettingsPanel.tsx",
-        "frontend/src/hooks/useFingeringMap.ts"
+        "frontend/src/components/OcarinaVisual.tsx"
       ],
       "components": [
         "blob-storage@4.0.0",
@@ -36,7 +35,45 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-15"
+        "REQ-17"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-each-of-the-4-overlaid-tone-holes-in-the-custom-image-mode-must-be-independently-resizable-provide-a-visible-resize-handle-e-g-a-small-drag-handle-on-the-edge-of-the-hole-circle-that-when-dragged-changes-the-radius-of-that-hole-the-minimum-radius-should-be-6px-and-the-maximum-should-be-60px-open-closed-visual-state-must-scale-with-the-hole-size",
+      "featureTitle": "Each of the 4 overlaid tone holes in the custom-image mode must be independently resizable. Provide a visible resize handle (e.g., a small drag handle on the edge of the hole circle) that, when dragged, changes the radius of that hole. The minimum radius should be 6px and the maximum should be 60px. Open/closed visual state must scale with the hole size.",
+      "files": [
+        "frontend/src/components/OcarinaVisual.tsx"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-18"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-persist-the-custom-hole-positions-and-sizes-in-component-state-so-that-repositioning-or-resizing-one-hole-does-not-affect-the-others-when-the-custom-image-is-removed-and-the-original-svg-is-restored-the-holes-revert-to-their-default-2-2-grid-positions-as-defined-in-ocarinavisual-tsx-when-a-new-custom-image-is-uploaded-the-holes-start-at-sensible-default-positions-centered-on-the-image",
+      "featureTitle": "Persist the custom hole positions and sizes in component state so that repositioning or resizing one hole does not affect the others. When the custom image is removed and the original SVG is restored, the holes revert to their default 2×2 grid positions as defined in OcarinaVisual.tsx. When a new custom image is uploaded, the holes start at sensible default positions centered on the image.",
+      "files": [
+        "frontend/src/components/OcarinaVisual.tsx"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-19"
       ],
       "confidence": "high"
     }

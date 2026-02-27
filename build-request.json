@@ -1,77 +1,103 @@
 {
   "kind": "build_request",
-  "title": "Persist fingering map to backend and extend Fingering Settings panel with global controls",
+  "title": "Replaceable ocarina image with draggable, resizable tone holes",
   "projectName": "Ocarina Composer",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-13",
-      "text": "Add a backend endpoint to save and load the full fingering map for all 8 diatonic notes (C5–C6). Each entry maps a note name to a 4-element array of booleans (open/closed holes). Expose an update method `saveFingeringMap` that accepts the full map and a query method `loadFingeringMap` that returns the stored map, persisting data in stable storage.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "a way to save the fingering map for all 8 notes to the backend, so it displays the configured ocarina tablature all the time"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A `saveFingeringMap` update method accepts the full 8-note fingering map and stores it in stable backend storage.",
-        "A `loadFingeringMap` query method returns the previously saved fingering map, or the default map if none has been saved.",
-        "The map persists across canister upgrades via stable variables."
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "Extend the `useFingeringMap` hook to support loading the persisted fingering map from the backend on app startup and saving the current in-memory fingering map to the backend on demand. On mount, call `loadFingeringMap` and override the local state with the retrieved map. Expose a `saveToBackend` function that calls `saveFingeringMap` with the current map.",
+      "id": "REQ-16",
+      "text": "Add an image upload control to the OcarinaVisual panel that lets users upload a custom PNG or JPEG file to replace the existing SVG ocarina illustration. The uploaded image is rendered as the ocarina body background, filling the same display area as the current SVG. The SVG layer itself is hidden when a custom image is active. A 'Remove custom image' button restores the original SVG illustration.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-recent-3",
+          "msg-recent-5"
         ],
         "quotes": [
-          "so it displays the configured ocarina tablature all the time",
-          "a way to save the fingering map for all 8 notes to the backend"
+          "make the image of the ocarina replaceable",
+          "Image upload: Users can upload a custom PNG/JPEG to replace the SVG ocarina illustration, with the hole indicators overlaid on top"
         ]
       },
       "acceptanceCriteria": [
-        "On app startup, the hook calls `loadFingeringMap` and hydrates the local fingering map with the backend response.",
-        "The hook exposes a `saveToBackend` async function that calls the backend `saveFingeringMap` with the current full map.",
-        "If no saved map exists on the backend, the hook falls back to the built-in defaults from `fingeringMap.ts`.",
-        "Loading state and error state are handled gracefully (no crash if backend is unavailable)."
+        "An upload button is visible in or near the OcarinaVisual component.",
+        "Selecting a PNG or JPEG file replaces the SVG illustration with the uploaded image rendered at the same size.",
+        "A 'Remove custom image' or reset button restores the original SVG illustration.",
+        "The uploaded image is stored in component state (client-side only; no backend persistence required)."
       ]
     },
     {
-      "id": "REQ-15",
-      "text": "Extend the existing `FingeringSettingsPanel.tsx` by adding a 'Global Controls' section at the top of the panel. This section must contain a 'Save Fingering Map' button that persists the current fingering map for all 8 notes to the backend via the `saveToBackend` function from `useFingeringMap`, and a status indicator (e.g., 'Saved' or 'Unsaved changes') reflecting whether the current in-memory map matches the last saved backend state. The existing per-note hole toggle grid and Reset to Defaults button remain unchanged below the global controls section.",
+      "id": "REQ-17",
+      "text": "When a custom image is active in the OcarinaVisual panel, overlay all 4 tone holes as absolutely-positioned interactive circles on top of the image. Each hole must be independently draggable to any position within the image bounds using pointer drag events. The open/closed fingering state (filled vs. empty circle) continues to update in real time as notes are selected or played.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-recent-4",
+          "msg-recent-5"
         ],
         "quotes": [
-          "it replace/extend that existing panel with a global controls, section at the top"
+          "the holes can be relocated",
+          "Draggable holes: Each of the 4 tone holes can be dragged to any position on the ocarina image"
         ]
       },
       "acceptanceCriteria": [
-        "A clearly labeled 'Global Controls' section appears at the top of the Fingering Settings panel.",
-        "A 'Save Fingering Map' button calls `saveToBackend` and shows a success or error toast/notification on completion.",
-        "A status indicator displays whether there are unsaved changes compared to the last successfully saved backend state.",
-        "The existing per-note fingering toggles and Reset to Defaults button remain fully functional below the global controls section.",
-        "The panel's visual style matches the existing warm earthy theme."
+        "All 4 tone holes are rendered as overlay circles on top of the custom uploaded image.",
+        "Each hole can be dragged independently to a new position within the image container.",
+        "Dragging is constrained to the bounds of the image container so holes cannot be moved outside it.",
+        "The open/closed state of each hole continues to reflect the current fingering in real time during and after repositioning."
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "text": "Each of the 4 overlaid tone holes in the custom-image mode must be independently resizable. Provide a visible resize handle (e.g., a small drag handle on the edge of the hole circle) that, when dragged, changes the radius of that hole. The minimum radius should be 6px and the maximum should be 60px. Open/closed visual state must scale with the hole size.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent-4",
+          "msg-recent-5"
+        ],
+        "quotes": [
+          "the holes can be relocated, and resized",
+          "Resizable holes: Each hole can be resized independently"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each hole circle has a visible resize handle.",
+        "Dragging the resize handle increases or decreases the hole's radius.",
+        "Minimum hole radius is 6px and maximum is 60px.",
+        "The filled (closed) and empty (open) state visuals scale correctly with the hole's current size."
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "text": "Persist the custom hole positions and sizes in component state so that repositioning or resizing one hole does not affect the others. When the custom image is removed and the original SVG is restored, the holes revert to their default 2×2 grid positions as defined in OcarinaVisual.tsx. When a new custom image is uploaded, the holes start at sensible default positions centered on the image.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent-4",
+          "msg-recent-5"
+        ],
+        "quotes": [
+          "the holes can be relocated, and resized"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each hole independently tracks its own position and radius in component state.",
+        "Changing one hole's position or size does not affect other holes.",
+        "On restoring the original SVG, holes return to their default SVG positions.",
+        "On uploading a new custom image, holes initialize to default positions spread across the image center area."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files in frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "The existing per-note fingering toggle UI and Reset to Defaults button in FingeringSettingsPanel.tsx must remain intact.",
-    "Backend changes must use stable variables so the fingering map survives canister upgrades."
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "Custom image storage is client-side only (no backend changes required for image blobs).",
+    "The existing open/closed fingering logic driven by useFingeringMap must remain fully functional in both SVG and custom-image modes."
   ],
   "nonGoals": [
-    "Do not change the fingering map data structure or the default values defined in fingeringMap.ts.",
-    "Do not add per-user or multi-profile fingering map storage — a single global map is sufficient.",
-    "Do not alter the OcarinaVisual, SheetMusic, or TablatureDiagram components directly; they already consume the fingering map from the hook."
+    "Persisting the custom ocarina image or hole layout to the backend canister.",
+    "Allowing more or fewer than 4 tone holes.",
+    "Changing the fingering map or hole open/closed logic.",
+    "Adding resize handles or draggable holes to the original SVG illustration mode."
   ],
   "imageRequirements": {
     "required": [],
