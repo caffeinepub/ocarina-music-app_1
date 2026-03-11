@@ -1,0 +1,229 @@
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/assets/fonts/BricolageGrotesque-VariableFont.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "General Sans";
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url("/assets/fonts/GeneralSans-Variable.woff2") format("woff2");
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Dark cinematic base */
+    --background: 0.07 0.008 55;
+    --foreground: 0.96 0.01 85;
+
+    --card: 0.11 0.01 55;
+    --card-foreground: 0.96 0.01 85;
+
+    --popover: 0.13 0.012 55;
+    --popover-foreground: 0.96 0.01 85;
+
+    /* Gold/Amber primary */
+    --primary: 0.75 0.15 85;
+    --primary-foreground: 0.1 0.02 55;
+
+    --secondary: 0.18 0.015 55;
+    --secondary-foreground: 0.85 0.02 85;
+
+    --muted: 0.15 0.01 55;
+    --muted-foreground: 0.55 0.025 70;
+
+    --accent: 0.75 0.15 85;
+    --accent-foreground: 0.1 0.02 55;
+
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 0.97 0.01 80;
+
+    --border: 0.2 0.018 55;
+    --input: 0.18 0.015 55;
+    --ring: 0.75 0.15 85;
+
+    --chart-1: 0.75 0.15 85;
+    --chart-2: 0.65 0.18 30;
+    --chart-3: 0.6 0.12 200;
+    --chart-4: 0.55 0.1 145;
+    --chart-5: 0.7 0.14 55;
+
+    --sidebar: 0.11 0.01 55;
+    --sidebar-foreground: 0.96 0.01 85;
+    --sidebar-primary: 0.75 0.15 85;
+    --sidebar-primary-foreground: 0.1 0.02 55;
+    --sidebar-accent: 0.18 0.015 55;
+    --sidebar-accent-foreground: 0.85 0.02 85;
+    --sidebar-border: 0.2 0.018 55;
+    --sidebar-ring: 0.75 0.15 85;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "General Sans", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .hero-glow {
+    background: radial-gradient(
+      ellipse 80% 50% at 50% -10%,
+      oklch(0.75 0.15 85 / 0.12) 0%,
+      transparent 70%
+    );
+  }
+
+  .gold-text {
+    background: linear-gradient(
+      135deg,
+      oklch(0.85 0.18 88),
+      oklch(0.65 0.12 75)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-glow:hover {
+    box-shadow: 0 0 0 1px oklch(0.75 0.15 85 / 0.3), 0 4px 32px
+      oklch(0.75 0.15 85 / 0.08);
+  }
+
+  .staff-line {
+    stroke: oklch(0.4 0.04 55);
+    stroke-width: 1;
+  }
+
+  .note-active {
+    filter: drop-shadow(0 0 6px oklch(0.75 0.15 85 / 0.8));
+  }
+
+  .piano-key-white {
+    background: linear-gradient(
+      to bottom,
+      oklch(0.92 0.02 80),
+      oklch(0.85 0.03 78)
+    );
+    border: 1px solid oklch(0.4 0.03 55);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 6px oklch(0.05 0.01 55 / 0.6), inset 0 1px 0
+      oklch(0.97 0.005 80);
+  }
+
+  .piano-key-white:hover {
+    background: linear-gradient(
+      to bottom,
+      oklch(0.9 0.04 85),
+      oklch(0.82 0.06 83)
+    );
+  }
+
+  .piano-key-white.active {
+    background: linear-gradient(
+      to bottom,
+      oklch(0.82 0.1 85),
+      oklch(0.72 0.14 83)
+    );
+    box-shadow: 0 1px 3px oklch(0.05 0.01 55 / 0.7), inset 0 2px 4px
+      oklch(0.05 0.01 55 / 0.4);
+    transform: translateY(2px);
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: oklch(0.12 0.01 55);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: oklch(0.3 0.02 55);
+    border-radius: 3px;
+  }
+
+  @keyframes float-note {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.6;
+    }
+    90% {
+      opacity: 0.2;
+    }
+    100% {
+      transform: translateY(-120vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  .animate-float-note {
+    animation: float-note linear infinite;
+  }
+
+  .shimmer-text {
+    background: linear-gradient(
+      90deg,
+      oklch(0.75 0.15 85),
+      oklch(0.9 0.2 88),
+      oklch(0.65 0.1 75),
+      oklch(0.85 0.18 90)
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+  }
+
+  .parchment-bg {
+    background-image: radial-gradient(
+        ellipse at 20% 30%,
+        oklch(0.75 0.15 85 / 0.08) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse at 80% 70%,
+        oklch(0.6 0.12 75 / 0.05) 0%,
+        transparent 60%
+      );
+  }
+}
